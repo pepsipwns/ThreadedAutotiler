@@ -27,6 +27,18 @@ public partial class TerrainHandler : Node
             new BitmaskTile(new Vector2I(3, 14), TopLeft),
             //Top Right
             new BitmaskTile(new Vector2I(4, 14), TopRight),
+            //Single Left Right
+            new BitmaskTile(new Vector2I(15, 15), SingleLeftRight),
+            //Single Top Bottom
+            new BitmaskTile(new Vector2I(12, 15), SingleTopBottom),
+            //Single Left
+            new BitmaskTile(new Vector2I(14, 14), SingleLeft),
+            //Single Right
+            new BitmaskTile(new Vector2I(15, 14), SingleRight),
+            //Single Top
+            new BitmaskTile(new Vector2I(13, 14), SingleTop),
+            //Single Bottom
+            new BitmaskTile(new Vector2I(13, 15), SingleBottom),
         };
     }
 
@@ -57,189 +69,72 @@ public partial class TerrainHandler : Node
 
     private ushort[] Top = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true, b: true, br: true),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            bl: true,
-            b: true,
-            br: true,
-            tr: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            bl: true,
-            b: true,
-            br: true,
-            tl: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            bl: true,
-            b: true,
-            br: true,
-            tl: true,
-            tr: true
-        ),
+        BitmaskConverter.ConvertTileToBitmask(t: false, tr: false, tl: false),
     };
 
     private ushort[] Bottom = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, tl: true, t: true, tr: true),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            tl: true,
-            t: true,
-            tr: true,
-            br: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            tl: true,
-            t: true,
-            tr: true,
-            bl: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            tl: true,
-            t: true,
-            tr: true,
-            bl: true,
-            br: true
-        ),
+        BitmaskConverter.ConvertTileToBitmask(b: false, br: false, bl: false),
     };
 
     private ushort[] Left = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(t: true, b: true, r: true, tr: true, br: true),
-        BitmaskConverter.ConvertTileToBitmask(
-            t: true,
-            b: true,
-            r: true,
-            tr: true,
-            br: true,
-            bl: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            t: true,
-            b: true,
-            r: true,
-            tr: true,
-            br: true,
-            tl: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            t: true,
-            b: true,
-            r: true,
-            tr: true,
-            br: true,
-            tl: true,
-            bl: true
-        ),
+        BitmaskConverter.ConvertTileToBitmask(l: false, tl: false, bl: false),
     };
 
     private ushort[] Right = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(t: true, b: true, l: true, tl: true, bl: true),
-        BitmaskConverter.ConvertTileToBitmask(
-            t: true,
-            b: true,
-            l: true,
-            tl: true,
-            bl: true,
-            br: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            t: true,
-            b: true,
-            l: true,
-            tl: true,
-            bl: true,
-            tr: true
-        ),
-        BitmaskConverter.ConvertTileToBitmask(
-            t: true,
-            b: true,
-            l: true,
-            tl: true,
-            bl: true,
-            tr: true,
-            br: true
-        ),
+        BitmaskConverter.ConvertTileToBitmask(r: false, tr: false, br: false),
     };
 
     private ushort[] TopRight = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(l: true, bl: true, b: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, bl: true, b: true, br: true),
-        BitmaskConverter.ConvertTileToBitmask(tl: true, l: true, bl: true, b: true),
-        BitmaskConverter.ConvertTileToBitmask(tl: true, l: true, bl: true, b: true, br: true),
+        BitmaskConverter.ConvertTileToBitmask(r: false, tr: false, t: false),
     };
 
     private ushort[] TopLeft = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(r: true, br: true, b: true),
-        BitmaskConverter.ConvertTileToBitmask(r: true, br: true, b: true, bl: true),
-        BitmaskConverter.ConvertTileToBitmask(tr: true, r: true, br: true, b: true),
-        BitmaskConverter.ConvertTileToBitmask(tr: true, r: true, br: true, b: true, bl: true),
+        BitmaskConverter.ConvertTileToBitmask(t: false, tl: false, l: false),
     };
 
     private ushort[] BottomRight = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(t: true, tl: true, l: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, tl: true, l: true, bl: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, tl: true, l: true, tr: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, tl: true, l: true, bl: true, tr: true),
+        BitmaskConverter.ConvertTileToBitmask(b: false, br: false, r: false),
     };
 
     private ushort[] BottomLeft = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(t: true, tr: true, r: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, tr: true, r: true, br: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, tr: true, r: true, tl: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, tr: true, r: true, br: true, tl: true),
+        BitmaskConverter.ConvertTileToBitmask(b: false, bl: false, l: false),
     };
 
     private ushort[] SingleLeftRight = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, br: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, tr: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, tl: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true, br: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true, tr: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true, tl: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true, br: true, tl: true),
-        BitmaskConverter.ConvertTileToBitmask(l: true, r: true, bl: true, br: true, tr: true),
-        BitmaskConverter.ConvertTileToBitmask(
-            l: true,
-            r: true,
-            bl: true,
-            br: true,
-            tl: true,
-            tr: true
-        ),
+        BitmaskConverter.ConvertTileToBitmask(t: false, b: false),
     };
 
     private ushort[] SingleTopBottom = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(t: true, b: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, b: true, tl: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, b: true, tl: true, tr: true),
-        BitmaskConverter.ConvertTileToBitmask(t: true, b: true, tl: true, bl: true),
+        BitmaskConverter.ConvertTileToBitmask(l: false, r: false),
     };
 
     private ushort[] SingleLeft = new ushort[]
     {
-        BitmaskConverter.ConvertTileToBitmask(r: true, b: true),
+        BitmaskConverter.ConvertTileToBitmask(l: false, b: false, t: false),
+    };
+
+    private ushort[] SingleRight = new ushort[]
+    {
+        BitmaskConverter.ConvertTileToBitmask(r: false, b: false, t: false),
+    };
+
+    private ushort[] SingleTop = new ushort[]
+    {
+        BitmaskConverter.ConvertTileToBitmask(l: false, r: false, t: false),
+    };
+
+    private ushort[] SingleBottom = new ushort[]
+    {
+        BitmaskConverter.ConvertTileToBitmask(l: false, r: false, b: false),
     };
 
     public static TerrainHandler Instance { get; private set; }

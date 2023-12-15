@@ -4,14 +4,14 @@ using System;
 public class BitmaskConverter
 {
     public static UInt16 ConvertTileToBitmask(
-        bool t = false,
-        bool b = false,
-        bool l = false,
-        bool r = false,
-        bool tl = false,
-        bool tr = false,
-        bool bl = false,
-        bool br = false
+        bool t = true,
+        bool b = true,
+        bool l = true,
+        bool r = true,
+        bool tl = true,
+        bool tr = true,
+        bool bl = true,
+        bool br = true
     )
     {
         if (!t)
