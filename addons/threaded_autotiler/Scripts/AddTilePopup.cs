@@ -50,6 +50,9 @@ public partial class AddTilePopup : AcceptDialog
     private ColorRect LeftRightHighlight;
 
     [Export]
+    private ColorRect SingleHighlight;
+
+    [Export]
     private Color DefaultColor = new Color("#00000000");
 
     [Export]
@@ -77,7 +80,8 @@ public partial class AddTilePopup : AcceptDialog
             SingleTopHighlight,
             SingleRightHighlight,
             UpDownHighlight,
-            LeftRightHighlight
+            LeftRightHighlight,
+            SingleHighlight
         };
         foreach (ColorRect highlight in Highlights)
         {

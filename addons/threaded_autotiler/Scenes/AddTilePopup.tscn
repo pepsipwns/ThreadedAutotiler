@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://iiey0umyi3n5"]
+[gd_scene load_steps=20 format=3 uid="uid://iiey0umyi3n5"]
 
 [ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/AddTilePopup.cs" id="1_mk5ut"]
 [ext_resource type="Texture2D" uid="uid://bhgn2ogjlkhxm" path="res://addons/threaded_autotiler/Assets/Sprites/top.png" id="1_okmm0"]
@@ -16,13 +16,14 @@
 [ext_resource type="Texture2D" uid="uid://c6yjsuogq8o3r" path="res://addons/threaded_autotiler/Assets/Sprites/singleright.png" id="12_a8wdw"]
 [ext_resource type="Texture2D" uid="uid://cqwopyona3c4k" path="res://addons/threaded_autotiler/Assets/Sprites/singletop.png" id="13_7yufd"]
 [ext_resource type="Texture2D" uid="uid://csukh6fawnlux" path="res://addons/threaded_autotiler/Assets/Sprites/singlebottom.png" id="14_wlcfc"]
+[ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="17_r0hlg"]
 
 [sub_resource type="Gradient" id="Gradient_ed35c"]
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_4j6kc"]
 gradient = SubResource("Gradient_ed35c")
 
-[node name="AddTilePopup" type="AcceptDialog" node_paths=PackedStringArray("CenterHighlight", "TopHighlight", "LeftHighlight", "RightHighlight", "BottomHighlight", "TLHighlight", "TRHighlight", "BRHighlight", "BLHighlight", "SingleDownHighlight", "SingleLeftHighlight", "SingleTopHighlight", "SingleRightHighlight", "UpDownHighlight", "LeftRightHighlight")]
+[node name="AddTilePopup" type="AcceptDialog" node_paths=PackedStringArray("CenterHighlight", "TopHighlight", "LeftHighlight", "RightHighlight", "BottomHighlight", "TLHighlight", "TRHighlight", "BRHighlight", "BLHighlight", "SingleDownHighlight", "SingleLeftHighlight", "SingleTopHighlight", "SingleRightHighlight", "UpDownHighlight", "LeftRightHighlight", "SingleHighlight")]
 title = "Add Tile"
 initial_position = 1
 size = Vector2i(208, 383)
@@ -44,6 +45,7 @@ SingleTopHighlight = NodePath("VBox/Container/GridContainer/SingleTopHighlight")
 SingleRightHighlight = NodePath("VBox/Container/GridContainer/SingleRightHighlight")
 UpDownHighlight = NodePath("VBox/Container/GridContainer/UpDownHighlight")
 LeftRightHighlight = NodePath("VBox/Container/GridContainer/LeftRightHighlight")
+SingleHighlight = NodePath("VBox/Container/GridContainer/SingleHighlight")
 SelectedColor = Color(0.254902, 0.552941, 0.415686, 1)
 
 [node name="VBox" type="VBoxContainer" parent="."]
@@ -107,7 +109,7 @@ columns = 8
 [node name="CenterHighlight" type="ColorRect" parent="VBox/Container/GridContainer"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-color = Color(0.254902, 0.494118, 0.4, 1)
+color = Color(0.254902, 0.552941, 0.415686, 1)
 
 [node name="Center" type="TextureButton" parent="VBox/Container/GridContainer/CenterHighlight"]
 layout_mode = 1
@@ -432,4 +434,26 @@ grow_horizontal = 2
 grow_vertical = 2
 toggle_mode = true
 texture_normal = ExtResource("10_yiqi1")
+stretch_mode = 5
+
+[node name="SingleHighlight" type="ColorRect" parent="VBox/Container/GridContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+color = Color(0, 0, 0, 0)
+
+[node name="Single" type="TextureButton" parent="VBox/Container/GridContainer/SingleHighlight"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+toggle_mode = true
+texture_normal = ExtResource("17_r0hlg")
 stretch_mode = 5
