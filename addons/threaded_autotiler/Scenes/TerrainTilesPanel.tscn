@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bj757c1bscdg1"]
+
+[node name="TerrainTilesPanel" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AddTileBtn" type="Button" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Add Tile"
+
+[node name="EditTileBtn" type="Button" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+text = "Edit Tile"
+
+[node name="GridBox" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 10

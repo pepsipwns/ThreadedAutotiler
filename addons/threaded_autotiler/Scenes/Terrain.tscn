@@ -1,0 +1,68 @@
+[gd_scene load_steps=3 format=3 uid="uid://bj0u1quofppsr"]
+
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/TerrainBlock.cs" id="1_gcoti"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_rg5mw"]
+font_size = 20
+
+[node name="Terrain" type="Control" node_paths=PackedStringArray("TerrainNameLabel", "TerrainBackground")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 1
+mouse_default_cursor_shape = 2
+script = ExtResource("1_gcoti")
+TerrainNameLabel = NodePath("Vbox/Texture/Margin/HBox/TerrainNameLabel")
+TerrainBackground = NodePath("Vbox/Texture")
+
+[node name="Vbox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+
+[node name="Texture" type="ColorRect" parent="Vbox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 0
+color = Color(0.129412, 0.14902, 0.180392, 1)
+
+[node name="Margin" type="MarginContainer" parent="Vbox/Texture"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="Vbox/Texture/Margin"]
+layout_mode = 2
+
+[node name="TerrainColorRect" type="ColorRect" parent="Vbox/Texture/Margin/HBox"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TerrainNameLabel" type="Label" parent="Vbox/Texture/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+text = "Terrain Name"
+label_settings = SubResource("LabelSettings_rg5mw")
+
+[node name="EditBtn" type="Button" parent="Vbox/Texture/Margin/HBox"]
+layout_mode = 2
+text = "Edit
+"
+
+[connection signal="mouse_entered" from="Vbox/Texture" to="." method="OnMouseEntered"]
+[connection signal="mouse_exited" from="Vbox/Texture" to="." method="OnMouseExited"]

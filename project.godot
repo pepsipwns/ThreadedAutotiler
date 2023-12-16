@@ -25,3 +25,7 @@ Debug="*res://Scenes/Debug.tscn"
 [dotnet]
 
 project/assembly_name="AutoTilerAtlas"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/threaded_autotiler/plugin.cfg")

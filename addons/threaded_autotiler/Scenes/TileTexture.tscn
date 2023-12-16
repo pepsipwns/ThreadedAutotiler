@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3 uid="uid://c7ppmnp6q3534"]
+
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/TileTexture.cs" id="1_0fnwh"]
+[ext_resource type="Texture2D" uid="uid://4jmyyuoxb84m" path="res://addons/threaded_autotiler/Assets/Sprites/bl.png" id="1_psgb2"]
+
+[sub_resource type="Gradient" id="Gradient_befgu"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_0b0m6"]
+gradient = SubResource("Gradient_befgu")
+
+[node name="TileTextureHighlight" type="ColorRect"]
+custom_minimum_size = Vector2(36, 36)
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0, 0, 0, 0)
+script = ExtResource("1_0fnwh")
+
+[node name="TileTexture" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture1D_0b0m6")
+expand_mode = 5
+
+[node name="TileModeTexture" type="TextureRect" parent="TileTexture"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -10.0
+offset_right = 10.0
+grow_vertical = 0
+texture = ExtResource("1_psgb2")
+expand_mode = 3
+stretch_mode = 5
+
+[connection signal="mouse_entered" from="TileTexture" to="." method="OnMouseEntered"]
+[connection signal="mouse_exited" from="TileTexture" to="." method="OnMouseExited"]

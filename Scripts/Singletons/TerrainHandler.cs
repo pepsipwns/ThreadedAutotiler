@@ -10,35 +10,35 @@ public partial class TerrainHandler : Node
         return new BitmaskTile[]
         {
             //Center Tiles
-            new BitmaskTile(new Vector2I(0, 15), new ushort[] { 255 }),
+            new BitmaskTile(new Vector2I(0, 15), 255),
             //Bottom
-            new BitmaskTile(new Vector2I(8, 15), Bottom),
+            new BitmaskTile(new Vector2I(8, 15), BitmaskStatic.Bottom),
             //Top
-            new BitmaskTile(new Vector2I(8, 14), Top),
+            new BitmaskTile(new Vector2I(8, 14), BitmaskStatic.Top),
             //Left
-            new BitmaskTile(new Vector2I(10, 15), Left),
+            new BitmaskTile(new Vector2I(10, 15), BitmaskStatic.Left),
             //Right
-            new BitmaskTile(new Vector2I(11, 15), Right),
+            new BitmaskTile(new Vector2I(11, 15), BitmaskStatic.Right),
             //Bottom Left
-            new BitmaskTile(new Vector2I(3, 15), BottomLeft),
+            new BitmaskTile(new Vector2I(3, 15), BitmaskStatic.BottomLeft),
             //Bottom Right
-            new BitmaskTile(new Vector2I(4, 15), BottomRight),
+            new BitmaskTile(new Vector2I(4, 15), BitmaskStatic.BottomRight),
             //Top Left
-            new BitmaskTile(new Vector2I(3, 14), TopLeft),
+            new BitmaskTile(new Vector2I(3, 14), BitmaskStatic.TopLeft),
             //Top Right
-            new BitmaskTile(new Vector2I(4, 14), TopRight),
+            new BitmaskTile(new Vector2I(4, 14), BitmaskStatic.TopRight),
             //Single Left Right
-            new BitmaskTile(new Vector2I(15, 15), SingleLeftRight),
+            new BitmaskTile(new Vector2I(15, 15), BitmaskStatic.SingleLeftRight),
             //Single Top Bottom
-            new BitmaskTile(new Vector2I(12, 15), SingleTopBottom),
+            new BitmaskTile(new Vector2I(12, 15), BitmaskStatic.SingleTopBottom),
             //Single Left
-            new BitmaskTile(new Vector2I(14, 14), SingleLeft),
+            new BitmaskTile(new Vector2I(14, 14), BitmaskStatic.SingleLeft),
             //Single Right
-            new BitmaskTile(new Vector2I(15, 14), SingleRight),
+            new BitmaskTile(new Vector2I(15, 14), BitmaskStatic.SingleRight),
             //Single Top
-            new BitmaskTile(new Vector2I(13, 14), SingleTop),
+            new BitmaskTile(new Vector2I(13, 14), BitmaskStatic.SingleTop),
             //Single Bottom
-            new BitmaskTile(new Vector2I(13, 15), SingleBottom),
+            new BitmaskTile(new Vector2I(13, 15), BitmaskStatic.SingleBottom),
         };
     }
 
@@ -47,95 +47,25 @@ public partial class TerrainHandler : Node
         return new BitmaskTile[]
         {
             //Center Tiles
-            new BitmaskTile(new Vector2I(0, 23), new ushort[] { 255 }),
+            new BitmaskTile(new Vector2I(0, 23), 255),
             //Bottom
-            new BitmaskTile(new Vector2I(6, 23), Bottom),
+            new BitmaskTile(new Vector2I(6, 23), BitmaskStatic.Bottom),
             //Top
-            new BitmaskTile(new Vector2I(6, 22), Top),
+            new BitmaskTile(new Vector2I(6, 22), BitmaskStatic.Top),
             //Left
-            new BitmaskTile(new Vector2I(10, 23), Left),
+            new BitmaskTile(new Vector2I(10, 23), BitmaskStatic.Left),
             //Right
-            new BitmaskTile(new Vector2I(9, 23), Right),
+            new BitmaskTile(new Vector2I(9, 23), BitmaskStatic.Right),
             //Bottom Left
-            new BitmaskTile(new Vector2I(2, 23), BottomLeft),
+            new BitmaskTile(new Vector2I(2, 23), BitmaskStatic.BottomLeft),
             //Bottom Right
-            new BitmaskTile(new Vector2I(3, 23), BottomRight),
+            new BitmaskTile(new Vector2I(3, 23), BitmaskStatic.BottomRight),
             //Top Left
-            new BitmaskTile(new Vector2I(2, 22), TopLeft),
+            new BitmaskTile(new Vector2I(2, 22), BitmaskStatic.TopLeft),
             //Top Right
-            new BitmaskTile(new Vector2I(3, 22), TopRight),
+            new BitmaskTile(new Vector2I(3, 22), BitmaskStatic.TopRight),
         };
     }
-
-    private ushort[] Top = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(t: false, tr: false, tl: false),
-    };
-
-    private ushort[] Bottom = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(b: false, br: false, bl: false),
-    };
-
-    private ushort[] Left = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(l: false, tl: false, bl: false),
-    };
-
-    private ushort[] Right = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(r: false, tr: false, br: false),
-    };
-
-    private ushort[] TopRight = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(r: false, tr: false, t: false),
-    };
-
-    private ushort[] TopLeft = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(t: false, tl: false, l: false),
-    };
-
-    private ushort[] BottomRight = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(b: false, br: false, r: false),
-    };
-
-    private ushort[] BottomLeft = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(b: false, bl: false, l: false),
-    };
-
-    private ushort[] SingleLeftRight = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(t: false, b: false),
-    };
-
-    private ushort[] SingleTopBottom = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(l: false, r: false),
-    };
-
-    private ushort[] SingleLeft = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(l: false, b: false, t: false),
-    };
-
-    private ushort[] SingleRight = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(r: false, b: false, t: false),
-    };
-
-    private ushort[] SingleTop = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(l: false, r: false, t: false),
-    };
-
-    private ushort[] SingleBottom = new ushort[]
-    {
-        BitmaskConverter.ConvertTileToBitmask(l: false, r: false, b: false),
-    };
 
     public static TerrainHandler Instance { get; private set; }
 
@@ -165,7 +95,7 @@ public partial class TerrainHandler : Node
         BitmaskTile[] tiles = GetBitmaskTiles(type);
         foreach (BitmaskTile tile in tiles)
         {
-            if (tile.BitmaskValue.Contains(bitmask))
+            if (tile.BitmaskValue == bitmask)
             {
                 return tile.AtlasValue;
             }

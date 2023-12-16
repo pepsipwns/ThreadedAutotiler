@@ -1,0 +1,130 @@
+[gd_scene load_steps=9 format=3 uid="uid://237ptseftxyp"]
+
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/Dock.cs" id="1_baj4v"]
+[ext_resource type="PackedScene" uid="uid://bj0u1quofppsr" path="res://addons/threaded_autotiler/Scenes/Terrain.tscn" id="2_2ovly"]
+[ext_resource type="PackedScene" uid="uid://bxwxuxqxfrkmd" path="res://addons/threaded_autotiler/Scenes/AddTerrainPopup.tscn" id="3_6scmw"]
+[ext_resource type="PackedScene" uid="uid://bj757c1bscdg1" path="res://addons/threaded_autotiler/Scenes/TerrainTilesPanel.tscn" id="4_378js"]
+[ext_resource type="PackedScene" uid="uid://c7ppmnp6q3534" path="res://addons/threaded_autotiler/Scenes/TileTexture.tscn" id="4_dssko"]
+[ext_resource type="PackedScene" uid="uid://iiey0umyi3n5" path="res://addons/threaded_autotiler/Scenes/AddTilePopup.tscn" id="4_jq75q"]
+
+[sub_resource type="Gradient" id="Gradient_u7bqt"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_u3c0r"]
+gradient = SubResource("Gradient_u7bqt")
+
+[node name="Dock" type="Control" node_paths=PackedStringArray("_terrains", "UnselectedLabel", "TerrainTilesPanel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_baj4v")
+TerrainScene = ExtResource("2_2ovly")
+AddTerrainPopupScene = ExtResource("3_6scmw")
+AddTilePopupScene = ExtResource("4_jq75q")
+_terrains = NodePath("Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/Terrains")
+UnselectedLabel = NodePath("Background/HBox/MarginRight/ColorRect/Margin/UnselectedLabel")
+TerrainTilesPanel = NodePath("Background/HBox/MarginRight/ColorRect/Margin/TerrainTilesPanel")
+TileTextureScene = ExtResource("4_dssko")
+defaultTileTexture = SubResource("GradientTexture2D_u3c0r")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.129412, 0.14902, 0.180392, 1)
+
+[node name="HBox" type="HBoxContainer" parent="Background"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginLeft" type="MarginContainer" parent="Background/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 8
+
+[node name="TerrainBackground" type="ColorRect" parent="Background/HBox/MarginLeft"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+color = Color(0.211765, 0.239216, 0.290196, 1)
+
+[node name="Margin" type="MarginContainer" parent="Background/HBox/MarginLeft/TerrainBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBox" type="VBoxContainer" parent="Background/HBox/MarginLeft/TerrainBackground/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox"]
+layout_mode = 2
+
+[node name="AddTerrainBtn" type="Button" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Add Terrain"
+
+[node name="Terrains" type="VBoxContainer" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox" groups=["Terrains"]]
+layout_mode = 2
+size_flags_vertical = 2
+theme_override_constants/separation = 52
+
+[node name="MarginRight" type="MarginContainer" parent="Background/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ColorRect" type="ColorRect" parent="Background/HBox/MarginRight"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.211765, 0.239216, 0.290196, 1)
+
+[node name="Margin" type="MarginContainer" parent="Background/HBox/MarginRight/ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 8
+
+[node name="TerrainTilesPanel" parent="Background/HBox/MarginRight/ColorRect/Margin" instance=ExtResource("4_378js")]
+visible = false
+layout_mode = 2
+
+[node name="UnselectedLabel" type="Label" parent="Background/HBox/MarginRight/ColorRect/Margin"]
+layout_mode = 2
+text = "Create/Select a Terrain..."
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer/AddTerrainBtn" to="." method="OnAddTerrainBtnPressed"]

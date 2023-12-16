@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxwxuxqxfrkmd"]
+
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/AddTerrainPopup.cs" id="1_kxwre"]
+
+[node name="AcceptDialog" type="AcceptDialog" node_paths=PackedStringArray("TerrainNameTextEdit")]
+title = "Add Terrain"
+initial_position = 2
+size = Vector2i(220, 100)
+visible = true
+script = ExtResource("1_kxwre")
+TerrainNameTextEdit = NodePath("HBox/TerrainNameTextEdit")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 212.0
+offset_bottom = 51.0
+
+[node name="TerrainNameTextEdit" type="TextEdit" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Terrain Name"
+
+[node name="TerrainColorPicker" type="ColorPickerButton" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
