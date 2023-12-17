@@ -21,6 +21,12 @@ size_flags_horizontal = 3
 disabled = true
 text = "Edit Tile"
 
+[node name="DeleteTileBtn" type="Button" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+text = "Delete Tile"
+
 [node name="GridBox" type="GridContainer" parent="."]
 layout_mode = 2
 columns = 10

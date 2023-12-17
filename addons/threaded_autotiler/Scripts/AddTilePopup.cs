@@ -97,6 +97,7 @@ public partial class AddTilePopup : AcceptDialog
 
     public void OnTileModePressed(string name)
     {
+        GD.Print("TileModePressed: " + name);
         TileMode = name;
         foreach (ColorRect highlight in Highlights)
         {
@@ -139,6 +140,8 @@ public partial class AddTilePopup : AcceptDialog
                 return UpDownHighlight;
             case "LeftRight":
                 return LeftRightHighlight;
+            case "Single":
+                return SingleHighlight;
             default:
                 return CenterHighlight;
         }
@@ -157,5 +160,26 @@ public partial class AddTilePopup : AcceptDialog
             highlight.Color = DefaultColor;
         }
         GetColorRectFromName(tileMode).Color = SelectedColor;
+    }
+
+    public void SetData(
+        Vector2I atlasCoords,
+        string tileMode,
+        Texture2D texture,
+        Action onOkButtonPressed
+    )
+    {
+        TileMode = tileMode;
+        GetNode<TextEdit>("VBox/HBox/TextEditX").Text = atlasCoords.X.ToString();
+        GetNode<TextEdit>("VBox/HBox/TextEditY").Text = atlasCoords.Y.ToString();
+        GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture = texture;
+        GetNode<Button>("VBox/HBox/Button").Pressed += () => onOkButtonPressed();
+    }
+
+    public void GetNodes(out TextEdit textEditX, out TextEdit textEditY, out Button onAtlasOkButton)
+    {
+        textEditX = GetNode<TextEdit>("VBox/HBox/TextEditX");
+        textEditY = GetNode<TextEdit>("VBox/HBox/TextEditY");
+        onAtlasOkButton = GetNode<Button>("VBox/HBox/Button");
     }
 }

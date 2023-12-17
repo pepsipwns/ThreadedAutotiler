@@ -49,4 +49,12 @@ public partial class TerrainBlock : Control
         TerrainBackground.Color = selected ? SelectedColor : DefaultColor;
         Selected = selected;
     }
+
+    public void SetData(string terrainName, Color color, Action<string, Color> OnEditTerrainPressed)
+    {
+        TerrainNameLabel.Text = terrainName; // TODO: We should replace all GetNode calls with this Export format
+        GetNode<ColorRect>("Vbox/Texture/Margin/HBox/TerrainColorRect").Color = color;
+        GetNode<Button>("Vbox/Texture/Margin/HBox/EditBtn").Pressed += () =>
+            OnEditTerrainPressed(terrainName, color);
+    }
 }

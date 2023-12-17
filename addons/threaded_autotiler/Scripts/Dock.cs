@@ -23,7 +23,10 @@ public partial class Dock : Control
     private Label UnselectedLabel;
 
     [Export]
-    private BoxContainer TerrainTilesPanel;
+    private MarginContainer TerrainTilesPanelParent;
+
+    [Export]
+    private PackedScene TerrainTilesPanel;
 
     [Export]
     private PackedScene TileTextureScene;
@@ -31,12 +34,61 @@ public partial class Dock : Control
     [Export]
     private Texture2D defaultTileTexture;
 
+    [Export]
+    private Texture2D Center;
+
+    [Export]
+    private Texture2D Top;
+
+    [Export]
+    private Texture2D Left;
+
+    [Export]
+    private Texture2D Right;
+
+    [Export]
+    private Texture2D Bottom;
+
+    [Export]
+    private Texture2D TL;
+
+    [Export]
+    private Texture2D TR;
+
+    [Export]
+    private Texture2D BR;
+
+    [Export]
+    private Texture2D BL;
+
+    [Export]
+    private Texture2D SingleDown;
+
+    [Export]
+    private Texture2D SingleLeft;
+
+    [Export]
+    private Texture2D SingleTop;
+
+    [Export]
+    private Texture2D SingleRight;
+
+    [Export]
+    private Texture2D UpDown;
+
+    [Export]
+    private Texture2D LeftRight;
+
+    [Export]
+    private Texture2D Single;
     public TileSet tileset;
 
     public TileMap tilemap;
 
     private List<TerrainBlock> _terrainBlocks = new List<TerrainBlock>();
+
     private List<TileTexture> _tileBlocks = new List<TileTexture>();
+    private List<TerrainData> _terrainData = new List<TerrainData>();
     private Dictionary<string, List<TileData>> _tileData = new Dictionary<string, List<TileData>>();
 
     private TileData selectedTile;
@@ -44,10 +96,36 @@ public partial class Dock : Control
     private Vector2 Offset = new Vector2(0, 0);
 
     private GridContainer TileTextureParent;
+    private BoxContainer terrainTilesPanel;
 
-    public override void _Ready() { }
+    public override void _Ready()
+    {
+        LoadData();
+    }
 
     public override void _Process(double delta) { }
+
+    public void SaveData()
+    {
+        PluginSaveHandler.SaveData(_tileData, _terrainData);
+    }
+
+    public void LoadData()
+    {
+        PluginSaveHandler.LoadData(out _tileData, out _terrainData);
+        foreach (string terrainName in _tileData.Keys)
+        {
+            TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock;
+            terrain.SetData(
+                terrainName,
+                _terrainData.FirstOrDefault(td => td.Name == terrainName).Color,
+                (name, color) => OnEditTerrainBtnPressed(name, color)
+            );
+            terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
+            _terrains.AddChild(terrain);
+            _terrainBlocks.Add(terrain);
+        }
+    }
 
     public void OnAddTerrainBtnPressed()
     {
@@ -60,6 +138,18 @@ public partial class Dock : Control
             Color color = popup.GetNode<ColorPickerButton>("HBox/TerrainColorPicker").Color;
             OnAddTerrainPopupConfirmed(text, color);
         };
+    }
+
+    public void OnAddTerrainPopupConfirmed(string name, Color color)
+    {
+        TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock; // Could be an issue
+        terrain.SetData(name, color, (name, color) => OnEditTerrainBtnPressed(name, color));
+        terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
+        _terrains.AddChild(terrain);
+        _terrainBlocks.Add(terrain);
+        _tileData.Add(name, new List<TileData>());
+        _terrainData.Add(new TerrainData(name, color));
+        SaveData();
     }
 
     public void OnEditTerrainBtnPressed(string name, Color color)
@@ -78,140 +168,149 @@ public partial class Dock : Control
         };
     }
 
-    public void OnAddTerrainPopupConfirmed(string name, Color color)
-    {
-        Control terrain = TerrainScene.Instantiate() as Control;
-        terrain.GetNode<Label>("Vbox/Texture/Margin/HBox/TerrainNameLabel").Text = name;
-        terrain.GetNode<ColorRect>("Vbox/Texture/Margin/HBox/TerrainColorRect").Color = color;
-        terrain.GetNode<Button>("Vbox/Texture/Margin/HBox/EditBtn").Pressed += () =>
-            OnEditTerrainBtnPressed(name, color);
-
-        _terrains.AddChild(terrain);
-        TerrainBlock t = terrain as TerrainBlock;
-        t.Name = name;
-        t.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
-        _terrainBlocks.Add(t);
-    }
-
     public void OnEditTerrainPopupConfirmed(string name, string newName, Color color)
     {
         Control terrain = _terrainBlocks.FirstOrDefault(t => t.Name == name);
         terrain.GetNode<Label>("Vbox/Texture/Margin/HBox/TerrainNameLabel").Text = newName;
         terrain.GetNode<ColorRect>("Vbox/Texture/Margin/HBox/TerrainColorRect").Color = color;
-    }
-
-    public void DrawTilesFromTilset()
-    {
-        TileSetAtlasSource source = tileset.GetSource(0) as TileSetAtlasSource;
-        int tileCount = source.GetTilesCount();
-        Texture2D tilemapTexture = source.Texture;
-
-        for (int i = 0; i < tileCount; i++)
-        {
-            Vector2I size = source.GetAtlasGridSize();
-            for (int y = 0; y < size.Y; y++)
-            {
-                for (int x = 0; x < size.X; x++)
-                {
-                    Vector2I tileCoords = new Vector2I(x, y);
-                    Rect2 rect = source.GetTileTextureRegion(tileCoords, 0);
-
-                    AtlasTexture atlasTexture = new AtlasTexture
-                    {
-                        Atlas = tilemapTexture,
-                        Region = rect
-                    };
-                    TextureRect tileTexture = TileTextureScene.Instantiate() as TextureRect;
-                    tileTexture.Texture = atlasTexture;
-                    TileTextureParent.AddChild(tileTexture);
-                }
-            }
-        }
+        _terrainData.FirstOrDefault(td => td.Name == name).SetData(newName, color);
+        SaveData();
     }
 
     public void OnTerrainBlockPressed(TerrainBlock terrainBlock)
     {
+        GD.Print("Terrain block pressed");
+        UnselectedLabel.Hide();
+        if (terrainTilesPanel != null)
+        {
+            terrainTilesPanel.QueueFree();
+        }
+
+        terrainTilesPanel = TerrainTilesPanel.Instantiate() as BoxContainer;
+        TileTextureParent = terrainTilesPanel.GetNode("GridBox") as GridContainer;
         foreach (TerrainBlock t in _terrainBlocks)
         {
             t.SetSelected(false);
         }
         terrainBlock.SetSelected(true);
-        UnselectedLabel.Hide();
-        TerrainTilesPanel.Show();
-        TileTextureParent = TerrainTilesPanel.GetNode("GridBox") as GridContainer;
-        Button addBtn = TerrainTilesPanel.GetNode<Button>("HBox/AddTileBtn");
-        Button editBtn = TerrainTilesPanel.GetNode<Button>("HBox/EditTileBtn");
-        addBtn.Pressed += () => OnAddTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
-        editBtn.Pressed += () => OnEditTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
+        terrainTilesPanel.GetNode<Button>("HBox/AddTileBtn").Pressed += () =>
+            OnAddTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
+        terrainTilesPanel.GetNode<Button>("HBox/EditTileBtn").Pressed += () =>
+            OnEditTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
+        terrainTilesPanel.GetNode<Button>("HBox/DeleteTileBtn").Pressed += () =>
+            OnDeleteTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
+        TerrainTilesPanelParent.AddChild(terrainTilesPanel);
+
+        foreach (TileTexture t in _tileBlocks)
+        {
+            t.QueueFree();
+        }
+        TileTextureParent.GetChildren().Clear();
+
+        _tileBlocks.Clear();
+        if (_tileData.ContainsKey(terrainBlock.TerrainNameLabel.Text))
+        {
+            List<TileData> tileData = _tileData[terrainBlock.TerrainNameLabel.Text];
+            foreach (TileData td in tileData)
+            {
+                TileTexture tileTexture = TileTextureScene.Instantiate() as TileTexture;
+                tileTexture.SetTextures(
+                    GetTextureFromAtlasCoords(td.AtlasCoords),
+                    GetTextureFromName(td.TileMode)
+                );
+                int id = GetNextAvailableId();
+                tileTexture.SetData(
+                    new Vector2I(td.AtlasCoords.X, td.AtlasCoords.Y),
+                    td.TileMode,
+                    terrainBlock.TerrainNameLabel.Text,
+                    id
+                );
+                tileTexture.TileBlockPressed += (tile) => OnTileBlockPressed(tile);
+                TileTextureParent.AddChild(tileTexture);
+
+                _tileBlocks.Add(tileTexture);
+            }
+        }
     }
 
-    public void OnAddTileBtnPressed(string name)
+    public void OnAddTileBtnPressed(string terrainName)
     {
-        AddTilePopup popup = AddTilePopupScene.Instantiate() as AddTilePopup;
-        AddChild(popup);
-        popup.PopupCentered();
-        TextEdit textX = popup.GetNode<TextEdit>("VBox/HBox/TextEditX");
-        TextEdit textY = popup.GetNode<TextEdit>("VBox/HBox/TextEditY");
-        Button atlasOkBtn = popup.GetNode<Button>("VBox/HBox/Button");
-        atlasOkBtn.Pressed += () => OnAtlasOkBtnPressed(popup, textX.Text, textY.Text);
-        popup.Confirmed += () =>
+        GD.Print("ADD TILE");
+        AddTilePopup addTilePopup = AddTilePopupScene.Instantiate() as AddTilePopup;
+        AddChild(addTilePopup);
+        addTilePopup.PopupCentered();
+        addTilePopup.GetNodes(out TextEdit textX, out TextEdit textY, out Button atlasOkBtn);
+        atlasOkBtn.Pressed += () => OnAtlasOkBtnPressed(addTilePopup, textX.Text, textY.Text);
+        addTilePopup.Confirmed += () => OnAddTileBtnConfirmed(addTilePopup, terrainName);
+    }
+
+    private void OnAddTileBtnConfirmed(AddTilePopup addTilePopup, string terrainName)
+    {
+        addTilePopup.GetNodes(out TextEdit textX, out TextEdit textY, out Button atlasOkBtn);
+        TextureRect textureRect = addTilePopup.GetNode<TextureRect>("VBox/VBox/Margin/Texture");
+        if (
+            textureRect.Texture is GradientTexture2D
+            || !int.TryParse(textX.Text, out int xInt)
+            || !int.TryParse(textY.Text, out int yInt)
+        )
         {
-            TextureRect textureRect = popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture");
-            if (
-                textureRect.Texture is GradientTexture2D
-                || !int.TryParse(textX.Text, out int xInt)
-                || !int.TryParse(textY.Text, out int yInt)
-            )
+            return;
+        }
+        TileTexture tileTexture = TileTextureScene.Instantiate() as TileTexture;
+        tileTexture.SetTextures(textureRect.Texture, addTilePopup.GetCurrentTexture());
+        tileTexture.SetSelected(false);
+        int id = GetNextAvailableId();
+        tileTexture.SetData(new Vector2I(xInt, yInt), addTilePopup.TileMode, terrainName, id);
+        _tileBlocks.Add(tileTexture);
+        TileData td = new TileData(id, new Vector2I(xInt, yInt), addTilePopup.TileMode);
+        if (!_tileData.ContainsKey(terrainName))
+        {
+            _tileData.Add(terrainName, new List<TileData> { td });
+        }
+        else
+        {
+            _tileData[terrainName].Add(td);
+        }
+        SaveData();
+        tileTexture.TileBlockPressed += (tile) => OnTileBlockPressed(tile);
+        TileTextureParent.AddChild(tileTexture);
+        addTilePopup.QueueFree();
+    }
+
+    private int GetNextAvailableId()
+    {
+        int id = 0;
+        foreach (List<TileData> tileData in _tileData.Values)
+        {
+            foreach (TileData td in tileData)
             {
-                return;
+                if (td.Id >= id)
+                {
+                    id = td.Id + 1;
+                }
             }
-            TileTexture tileTexture = TileTextureScene.Instantiate() as TileTexture;
-            tileTexture.GetNode<TextureRect>("TileTexture").Texture = textureRect.Texture;
-            tileTexture.GetNode<TextureRect>("TileTexture/TileModeTexture").Texture =
-                popup.GetCurrentTexture();
-            tileTexture.SetSelected(false);
-            tileTexture.AtlasCoords = new Vector2I(xInt, yInt);
-            tileTexture.TileMode = popup.TileMode;
-            tileTexture.TerrainName = name;
-            _tileBlocks.Add(tileTexture);
-            TileData td = new TileData(
-                new Vector2I(xInt, yInt),
-                popup.TileMode,
-                textureRect.Texture
-            );
-            if (!_tileData.ContainsKey(name))
-            {
-                _tileData.Add(name, new List<TileData> { td });
-            }
-            else
-            {
-                _tileData[name].Add(td);
-            }
-            tileTexture.TileBlockPressed += (tile) => OnTileBlockPressed(tile);
-            TileTextureParent.AddChild(tileTexture);
-        };
+        }
+        return id;
     }
 
     public void OnEditTileBtnPressed(string terrainName)
     {
-        AddTilePopup popup = AddTilePopupScene.Instantiate() as AddTilePopup;
-        AddChild(popup);
-        popup.PopupCentered();
-        List<TileData> tileDatas = _tileData[terrainName];
-        TileData tileData = tileDatas.FirstOrDefault(
+        AddTilePopup addTilePopup = AddTilePopupScene.Instantiate() as AddTilePopup;
+        AddChild(addTilePopup);
+        addTilePopup.PopupCentered();
+        TileData tileData = _tileData[terrainName].FirstOrDefault(
             td => td.AtlasCoords == selectedTile.AtlasCoords
         );
-        TextEdit xEdit = popup.GetNode<TextEdit>("VBox/HBox/TextEditX");
-        TextEdit yEdit = popup.GetNode<TextEdit>("VBox/HBox/TextEditY");
-        popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture = tileData.Texture;
-        xEdit.Text = tileData.AtlasCoords.X.ToString();
-        yEdit.Text = tileData.AtlasCoords.Y.ToString();
-        popup.SetTileMode(tileData.TileMode);
-        Button atlasOkBtn = popup.GetNode<Button>("VBox/HBox/Button");
-        atlasOkBtn.Pressed += () => OnAtlasOkBtnPressed(popup, xEdit.Text, yEdit.Text);
-        popup.Confirmed += () =>
+        addTilePopup.GetNodes(out TextEdit xEdit, out TextEdit yEdit, out Button atlasOkBtn);
+        addTilePopup.SetData(
+            tileData.AtlasCoords,
+            tileData.TileMode,
+            GetTextureFromAtlasCoords(tileData.AtlasCoords.X, tileData.AtlasCoords.Y),
+            () => OnAtlasOkBtnPressed(addTilePopup, xEdit.Text, yEdit.Text)
+        );
+        addTilePopup.Confirmed += () =>
         {
-            TextureRect textureRect = popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture");
+            TextureRect textureRect = addTilePopup.GetNode<TextureRect>("VBox/VBox/Margin/Texture");
             if (
                 textureRect.Texture is GradientTexture2D
                 || !int.TryParse(xEdit.Text, out int xInt)
@@ -221,23 +320,36 @@ public partial class Dock : Control
                 return;
             }
             TileTexture tileTexture = _tileBlocks.FirstOrDefault(
-                tb => tb.AtlasCoords == selectedTile.AtlasCoords
+                t => t.TerrainName == terrainName && t.AtlasCoords == selectedTile.AtlasCoords
             );
-            tileTexture.GetNode<TextureRect>("TileTexture").Texture = textureRect.Texture;
-            tileTexture.GetNode<TextureRect>("TileTexture/TileModeTexture").Texture =
-                popup.GetCurrentTexture();
-            tileTexture.TerrainName = terrainName;
-            tileData.AtlasCoords = new Vector2I(xInt, yInt);
-            tileTexture.AtlasCoords = new Vector2I(xInt, yInt);
-            GD.Print("Edit: ", tileData.AtlasCoords, " ", selectedTile.AtlasCoords);
-            tileData.TileMode = popup.TileMode;
-            tileData.Texture = textureRect.Texture;
+            tileTexture.SetTextures(textureRect.Texture, addTilePopup.GetCurrentTexture());
+            tileTexture.SetData(
+                new Vector2I(xInt, yInt),
+                addTilePopup.TileMode,
+                terrainName,
+                tileData.Id
+            );
+            tileData.SetData(tileData.Id, new Vector2I(xInt, yInt), addTilePopup.TileMode);
+            SaveData();
+            addTilePopup.QueueFree();
         };
+    }
+
+    private void OnDeleteTileBtnPressed(string terrainName)
+    {
+        TileTexture tileTexture = _tileBlocks.FirstOrDefault(
+            t => t.TerrainName == terrainName && t.AtlasCoords == selectedTile.AtlasCoords
+        );
+        _tileBlocks.Remove(tileTexture);
+        TileTextureParent.RemoveChild(tileTexture);
+        _tileData[terrainName].Remove(selectedTile);
+        SaveData();
     }
 
     private void OnTileBlockPressed(TileTexture tile)
     {
-        TerrainTilesPanel.GetNode<Button>("HBox/EditTileBtn").Disabled = false;
+        terrainTilesPanel.GetNode<Button>("HBox/EditTileBtn").Disabled = false;
+        terrainTilesPanel.GetNode<Button>("HBox/DeleteTileBtn").Disabled = false;
         foreach (TileTexture t in _tileBlocks)
         {
             t.SetSelected(false);
@@ -255,15 +367,11 @@ public partial class Dock : Control
             return;
         }
 
-        GD.Print("x: ", xInt, " y: ", yInt);
-
         TileSetAtlasSource source = tileset.GetSource(0) as TileSetAtlasSource;
         if (source.HasTile(new Vector2I(xInt, yInt)))
         {
-            Rect2 rect = source.GetTileTextureRegion(new Vector2I(xInt, yInt), 0);
-            Texture2D tilemapTexture = source.Texture;
-            AtlasTexture atlasTexture = new AtlasTexture { Atlas = tilemapTexture, Region = rect };
-            popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture = atlasTexture;
+            popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture =
+                GetTextureFromAtlasCoords(xInt, yInt);
         }
         else
         {
@@ -271,8 +379,61 @@ public partial class Dock : Control
         }
     }
 
+    private AtlasTexture GetTextureFromAtlasCoords(Vector2I coords)
+    {
+        return GetTextureFromAtlasCoords(coords.X, coords.Y);
+    }
+
+    private AtlasTexture GetTextureFromAtlasCoords(int x, int y)
+    {
+        TileSetAtlasSource source = tileset.GetSource(0) as TileSetAtlasSource;
+        Rect2 rect = source.GetTileTextureRegion(new Vector2I(x, y), 0);
+        Texture2D tilemapTexture = source.Texture;
+        AtlasTexture a = new AtlasTexture { Atlas = tilemapTexture, Region = rect };
+        return a;
+    }
+
     public void TilesetChanged()
     {
         GD.Print("Tileset changed");
+    }
+
+    private Texture2D GetTextureFromName(string name)
+    {
+        switch (name)
+        {
+            case "Center":
+                return Center;
+            case "Top":
+                return Top;
+            case "Left":
+                return Left;
+            case "Right":
+                return Right;
+            case "Bottom":
+                return Bottom;
+            case "TL":
+                return TL;
+            case "TR":
+                return TR;
+            case "BR":
+                return BR;
+            case "BL":
+                return BL;
+            case "SingleDown":
+                return SingleDown;
+            case "SingleLeft":
+                return SingleLeft;
+            case "SingleTop":
+                return SingleTop;
+            case "SingleRight":
+                return SingleRight;
+            case "UpDown":
+                return UpDown;
+            case "LeftRight":
+                return LeftRight;
+            default:
+                return Center;
+        }
     }
 }
