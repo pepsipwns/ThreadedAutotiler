@@ -8,7 +8,7 @@ This allows me to run these calculations, and save the tilemap data to disk almo
 ## Example Images / GIFs
 ![image](https://github.com/pepsipwns/AutoTilerAtlas/assets/7117827/9b507e7b-36a2-4412-bdf2-6536781b8324)
 
-![image](https://gyazo.com/2f295596cc092351f1a7717644d18197)
+https://gyazo.com/2f295596cc092351f1a7717644d18197
 https://gyazo.com/4ae27c025183f3d42a6c552cc67ab018
 
 ## Usage (WIP)
