@@ -49,7 +49,11 @@ public partial class MapGeneration : Node
         GenerateBitmaskMap();
         GenerateAtlasMap();
         MapGenerated = true;
-        GD.Print("Map generated in " + (Time.GetUnixTimeFromSystem() - time) + " seconds");
+        GD.Print(
+            "[Threaded Autotiler] Map generated in "
+                + (Time.GetUnixTimeFromSystem() - time)
+                + " seconds"
+        );
     }
 
     /// <summary>

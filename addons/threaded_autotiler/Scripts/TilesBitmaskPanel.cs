@@ -119,7 +119,11 @@ public partial class TilesBitmaskPanel : VBoxContainer
                 return SingleBitmaskButton;
             default:
             {
-                GD.Print("GetBitmaskButtonFromTileMode RETURNED NULL " + mode);
+                GD.PrintErr(
+                    "[Threaded Autotiler] GetBitmaskButtonFromTileMode returned null with mode ["
+                        + mode
+                        + "]"
+                );
                 return null;
             }
         }
