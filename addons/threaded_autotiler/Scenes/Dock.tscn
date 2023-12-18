@@ -1,11 +1,9 @@
-[gd_scene load_steps=25 format=3 uid="uid://237ptseftxyp"]
+[gd_scene load_steps=24 format=3 uid="uid://237ptseftxyp"]
 
 [ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/Dock.cs" id="1_baj4v"]
 [ext_resource type="PackedScene" uid="uid://bj0u1quofppsr" path="res://addons/threaded_autotiler/Scenes/Terrain.tscn" id="2_2ovly"]
 [ext_resource type="PackedScene" uid="uid://bxwxuxqxfrkmd" path="res://addons/threaded_autotiler/Scenes/AddTerrainPopup.tscn" id="3_6scmw"]
-[ext_resource type="PackedScene" uid="uid://bj757c1bscdg1" path="res://addons/threaded_autotiler/Scenes/TerrainTilesPanel.tscn" id="4_bmq01"]
-[ext_resource type="PackedScene" uid="uid://c7ppmnp6q3534" path="res://addons/threaded_autotiler/Scenes/TileTexture.tscn" id="4_dssko"]
-[ext_resource type="PackedScene" uid="uid://iiey0umyi3n5" path="res://addons/threaded_autotiler/Scenes/AddTilePopup.tscn" id="4_jq75q"]
+[ext_resource type="PackedScene" uid="uid://ds2d2eupda4ux" path="res://addons/threaded_autotiler/Scenes/TilesBitmaskPanel.tscn" id="4_y7pn7"]
 [ext_resource type="Texture2D" uid="uid://dq7l3x3lg13rw" path="res://addons/threaded_autotiler/Assets/Sprites/center.png" id="6_fff5j"]
 [ext_resource type="Texture2D" uid="uid://bhgn2ogjlkhxm" path="res://addons/threaded_autotiler/Assets/Sprites/top.png" id="7_mpiq1"]
 [ext_resource type="Texture2D" uid="uid://cbyomt8j5ymbm" path="res://addons/threaded_autotiler/Assets/Sprites/left.png" id="8_fsbh2"]
@@ -22,13 +20,19 @@
 [ext_resource type="Texture2D" uid="uid://7dnk3cdbj3m4" path="res://addons/threaded_autotiler/Assets/Sprites/updown.png" id="19_cjgml"]
 [ext_resource type="Texture2D" uid="uid://mjf6is4nq1t7" path="res://addons/threaded_autotiler/Assets/Sprites/leftright.png" id="20_ioqpd"]
 [ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="21_cxtvm"]
+[ext_resource type="PackedScene" uid="uid://cda7o5qdqshyd" path="res://addons/threaded_autotiler/Scenes/SetTilePanel.tscn" id="24_r3rbm"]
 
-[sub_resource type="Gradient" id="Gradient_u7bqt"]
+[sub_resource type="LabelSettings" id="LabelSettings_ihgql"]
+font_size = 20
+shadow_size = 4
+shadow_color = Color(0, 0, 0, 0.160784)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_u3c0r"]
-gradient = SubResource("Gradient_u7bqt")
+[sub_resource type="LabelSettings" id="LabelSettings_g8e6r"]
+line_spacing = -2.0
+font_size = 14
+font_color = Color(0.792157, 0.792157, 0.792157, 1)
 
-[node name="Dock" type="Control" node_paths=PackedStringArray("_terrains", "UnselectedLabel", "TerrainTilesPanelParent")]
+[node name="Dock" type="Control" node_paths=PackedStringArray("_terrains", "UnselectedLabel", "TilesBitmaskPanelParent", "SetTilePanelParent")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,13 +42,13 @@ grow_vertical = 2
 script = ExtResource("1_baj4v")
 TerrainScene = ExtResource("2_2ovly")
 AddTerrainPopupScene = ExtResource("3_6scmw")
-AddTilePopupScene = ExtResource("4_jq75q")
 _terrains = NodePath("Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/ScrollContainer/Terrains")
-UnselectedLabel = NodePath("Background/HBox/MarginRight/ColorRect/Margin/UnselectedLabel")
-TerrainTilesPanelParent = NodePath("Background/HBox/MarginRight/ColorRect/Margin")
-TerrainTilesPanel = ExtResource("4_bmq01")
-TileTextureScene = ExtResource("4_dssko")
-defaultTileTexture = SubResource("GradientTexture2D_u3c0r")
+UnselectedLabel = NodePath("Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/UnselectedLabel")
+TilesBitmaskPanelParent = NodePath("Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox/TilesBitmaskBackground/TilesBitmaskParent")
+TilesBitmaskPanel = ExtResource("4_y7pn7")
+SetTilePanelParent = NodePath("Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox/SetTileBackground/SetTileParent")
+SetTilePanel = ExtResource("24_r3rbm")
+defaultTileTexture = ExtResource("21_cxtvm")
 Center = ExtResource("6_fff5j")
 Top = ExtResource("7_mpiq1")
 Left = ExtResource("8_fsbh2")
@@ -136,7 +140,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 2
 theme_override_constants/separation = 4
 
-[node name="MarginRight" type="MarginContainer" parent="Background/HBox"]
+[node name="TerrainTilesPanelNew" type="MarginContainer" parent="Background/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 0
@@ -144,12 +148,12 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="ColorRect" type="ColorRect" parent="Background/HBox/MarginRight"]
+[node name="ColorRect" type="ColorRect" parent="Background/HBox/TerrainTilesPanelNew"]
 layout_mode = 2
 size_flags_horizontal = 3
 color = Color(0.211765, 0.239216, 0.290196, 1)
 
-[node name="Margin" type="MarginContainer" parent="Background/HBox/MarginRight/ColorRect"]
+[node name="Margin" type="MarginContainer" parent="Background/HBox/TerrainTilesPanelNew/ColorRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -157,15 +161,64 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 4
+theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 8
 
-[node name="UnselectedLabel" type="Label" parent="Background/HBox/MarginRight/ColorRect/Margin"]
+[node name="UnselectedLabel" type="Label" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin"]
+visible = false
 layout_mode = 2
 text = "Create/Select a Terrain..."
 horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin"]
+layout_mode = 2
+theme_override_constants/separation = -2
+
+[node name="TileBitmasksLabel" type="Label" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer"]
+layout_mode = 2
+text = "Tile Bitmasks
+"
+label_settings = SubResource("LabelSettings_ihgql")
+
+[node name="TileBitmasksDesc" type="Label" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+text = "Click a tile orientation below to set or edit the tile for that orientation"
+label_settings = SubResource("LabelSettings_g8e6r")
+autowrap_mode = 3
+
+[node name="HBox" type="HBoxContainer" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="TilesBitmaskBackground" type="ColorRect" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.129412, 0.14902, 0.180392, 1)
+
+[node name="TilesBitmaskParent" type="ScrollContainer" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox/TilesBitmaskBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SetTileBackground" type="ColorRect" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.129412, 0.14902, 0.180392, 1)
+
+[node name="SetTileParent" type="ScrollContainer" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox/SetTileBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [connection signal="pressed" from="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer/AddTerrainBtn" to="." method="OnAddTerrainBtnPressed"]
 [connection signal="pressed" from="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer/DeleteTerrainBtn" to="." method="OnDeleteTerrainBtnPressed"]

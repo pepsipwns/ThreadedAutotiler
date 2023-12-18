@@ -348,7 +348,6 @@ sources/0 = SubResource("TileSetAtlasSource_5dlvx")
 script = ExtResource("1_vb4mj")
 LoadingLabel = NodePath("CanvasLayer/Control/Label")
 Tilemap = NodePath("TileMap")
-GenerateOnThread = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

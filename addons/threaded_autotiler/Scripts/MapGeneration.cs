@@ -231,6 +231,11 @@ public partial class MapGeneration : Node
             {
                 for (int y = 0; y < mapSize; y++)
                 {
+                    if (!TerrainMap[z][x, y])
+                    {
+                        atlas[x, y] = new Vector2I(-1, -1);
+                        continue;
+                    }
                     atlas[x, y] = GetAtlasTile(_terrainData[z].Name, bitmask[x, y]);
                 }
             }

@@ -1,0 +1,130 @@
+[gd_scene load_steps=6 format=3 uid="uid://cda7o5qdqshyd"]
+
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/AtlasTextEdit.cs" id="1_78cki"]
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/SetTilePanel.cs" id="1_r1pvw"]
+[ext_resource type="Texture2D" uid="uid://dq7l3x3lg13rw" path="res://addons/threaded_autotiler/Assets/Sprites/center.png" id="3_7y30r"]
+[ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="3_tipeo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tk1s1"]
+
+[node name="SetTilePanel" type="VBoxContainer" node_paths=PackedStringArray("XAtlasTextEdit", "YAtlasTextEdit", "YUp", "YDown", "XUp", "XDown", "TileTexture", "TileModeTexture", "SetTileButton", "ClearTileButton")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_r1pvw")
+XAtlasTextEdit = NodePath("MarginContainer/VBox/HBox/TextEditX")
+YAtlasTextEdit = NodePath("MarginContainer/VBox/HBox/TextEditY")
+YUp = NodePath("MarginContainer/VBox/HBox/YUpBtn")
+YDown = NodePath("MarginContainer/VBox/HBox/YDownBtn")
+XUp = NodePath("MarginContainer/VBox/HBox/XUpBtn")
+XDown = NodePath("MarginContainer/VBox/HBox/XDownBtn")
+TileTexture = NodePath("MarginContainer/VBox/VBox/Margin/TileTexture")
+TileModeTexture = NodePath("MarginContainer/VBox/VBox/Margin/TileTexture/TileModeTexture")
+SetTileButton = NodePath("MarginContainer/VBox/HBoxContainer/SetTileBtn")
+ClearTileButton = NodePath("MarginContainer/VBox/HBoxContainer/ClearTileBtn")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBox"]
+layout_mode = 2
+text = "Atlas Coords"
+
+[node name="HBox" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="XDownBtn" type="Button" parent="MarginContainer/VBox/HBox"]
+layout_mode = 2
+text = "<
+"
+
+[node name="TextEditX" type="TextEdit" parent="MarginContainer/VBox/HBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+placeholder_text = "0"
+
+[node name="XUpBtn" type="Button" parent="MarginContainer/VBox/HBox"]
+layout_mode = 2
+text = ">
+"
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBox/HBox"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxEmpty_tk1s1")
+
+[node name="YDownBtn" type="Button" parent="MarginContainer/VBox/HBox"]
+layout_mode = 2
+text = "<
+"
+
+[node name="TextEditY" type="TextEdit" parent="MarginContainer/VBox/HBox" node_paths=PackedStringArray("Up", "Down")]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+placeholder_text = "0"
+script = ExtResource("1_78cki")
+Up = NodePath("../YUpBtn")
+Down = NodePath("../YDownBtn")
+
+[node name="YUpBtn" type="Button" parent="MarginContainer/VBox/HBox"]
+layout_mode = 2
+text = ">"
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBox/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_top = 16
+
+[node name="TileTexture" type="TextureRect" parent="MarginContainer/VBox/VBox/Margin"]
+texture_filter = 1
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("3_tipeo")
+expand_mode = 5
+
+[node name="TileModeTexture" type="TextureRect" parent="MarginContainer/VBox/VBox/Margin/TileTexture"]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 40.0
+grow_vertical = 0
+texture = ExtResource("3_7y30r")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="SetTileBtn" type="Button" parent="MarginContainer/VBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Set Tile"
+
+[node name="ClearTileBtn" type="Button" parent="MarginContainer/VBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Clear Tile"
