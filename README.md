@@ -16,8 +16,10 @@ This allows me to run these calculations, and save the tilemap data to disk almo
 7. Enter your tile's atlas positions, and press 'Set Tile'.
 8. Once your happy all  your tiles are in position, thats all we need to do here!
 
-In your map generation script, or perhaps your using this for chunking, whatever! There are two functions (at the moment) which you need! I've used C# to build this plugin so all the functions are in C# currently. 
+In your map generation script, or perhaps your using this for chunking, whatever! There are two functions (at the moment) which you need! I've used C# to build this plugin so all the functions are in C# currently.
+
 See https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_scripting.html for using these C# scripts in gdscript.
+
 **IMPORTANT** The MapGeneration class is an autoload singleton, which is accesible via MapGeneration.Instance... so each function, property I mention in the following will require MapGeneration.Instance. before it.
 1. GenerateMap(FastNoiseLite noise, int mapSize, bool useEdges)
      - FastNoiseLite being a noise you've generated before hand
