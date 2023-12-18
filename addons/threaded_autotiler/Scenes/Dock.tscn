@@ -39,7 +39,7 @@ script = ExtResource("1_baj4v")
 TerrainScene = ExtResource("2_2ovly")
 AddTerrainPopupScene = ExtResource("3_6scmw")
 AddTilePopupScene = ExtResource("4_jq75q")
-_terrains = NodePath("Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/Terrains")
+_terrains = NodePath("Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/ScrollContainer/Terrains")
 UnselectedLabel = NodePath("Background/HBox/MarginRight/ColorRect/Margin/UnselectedLabel")
 TerrainTilesPanelParent = NodePath("Background/HBox/MarginRight/ColorRect/Margin")
 TerrainTilesPanel = ExtResource("4_bmq01")
@@ -120,10 +120,21 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Add Terrain"
 
-[node name="Terrains" type="VBoxContainer" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox" groups=["Terrains"]]
+[node name="DeleteTerrainBtn" type="Button" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+text = "Delete Terrain"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Terrains" type="VBoxContainer" parent="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/ScrollContainer" groups=["Terrains"]]
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 2
-theme_override_constants/separation = 52
+theme_override_constants/separation = 4
 
 [node name="MarginRight" type="MarginContainer" parent="Background/HBox"]
 layout_mode = 2
@@ -157,3 +168,4 @@ text = "Create/Select a Terrain..."
 horizontal_alignment = 1
 
 [connection signal="pressed" from="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer/AddTerrainBtn" to="." method="OnAddTerrainBtnPressed"]
+[connection signal="pressed" from="Background/HBox/MarginLeft/TerrainBackground/Margin/VBox/HBoxContainer/DeleteTerrainBtn" to="." method="OnDeleteTerrainBtnPressed"]

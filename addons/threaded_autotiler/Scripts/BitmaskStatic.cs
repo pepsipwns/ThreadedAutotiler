@@ -61,24 +61,39 @@ public class BitmaskStatic
     public static ushort SingleLeft = BitmaskConverter.ConvertTileToBitmask(
         l: false,
         b: false,
-        t: false
+        t: false,
+        tl: false,
+        bl: false
     );
 
     public static ushort SingleRight = BitmaskConverter.ConvertTileToBitmask(
         r: false,
         b: false,
-        t: false
+        t: false,
+        tr: false,
+        br: false,
+        tl: false
     );
 
     public static ushort SingleTop = BitmaskConverter.ConvertTileToBitmask(
         l: false,
         r: false,
-        t: false
+        t: false,
+        tl: false,
+        tr: false
     );
 
     public static ushort SingleBottom = BitmaskConverter.ConvertTileToBitmask(
         l: false,
         r: false,
-        b: false
+        b: false,
+        bl: false,
+        br: false
+    );
+    public static ushort Single = BitmaskConverter.ConvertTileToBitmask(
+        l: false,
+        r: false,
+        b: false,
+        t: false
     );
 }

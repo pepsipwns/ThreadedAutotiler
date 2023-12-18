@@ -3,7 +3,7 @@ using System;
 
 public class BitmaskConverter
 {
-    public static UInt16 ConvertTileToBitmask(
+    public static ushort ConvertTileToBitmask(
         bool t = true,
         bool b = true,
         bool l = true,

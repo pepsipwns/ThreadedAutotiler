@@ -378,7 +378,6 @@ text = "Loading 0%"
 position = Vector2(120, 120)
 tile_set = SubResource("TileSet_y2vwo")
 format = 2
-layer_1/tile_data = PackedInt32Array()
 
 [node name="Icon" type="Sprite2D" parent="."]
 position = Vector2(228, 69)

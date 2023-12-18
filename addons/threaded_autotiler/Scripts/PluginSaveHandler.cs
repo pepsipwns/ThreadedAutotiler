@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 [Tool]
 public class PluginSaveHandler
@@ -13,14 +14,18 @@ public class PluginSaveHandler
 
         GD.Print("Saving data");
 
+        List<TerrainData> sortedList = terrains.OrderBy(o => o.Layer).ToList();
         file.StoreVar(data.Count);
-        foreach (string layer in data.Keys)
+
+        foreach (TerrainData td in sortedList)
         {
-            TerrainData td = terrains.Find(t => t.Name == layer);
-            file.StoreVar(layer);
+            file.StoreVar(td.Name);
             file.StoreVar(td.Color.ToHtml());
-            file.StoreVar(data[layer].Count);
-            foreach (TileData tile in data[layer])
+            file.StoreVar(td.Biome);
+            file.StoreVar(td.Height);
+            file.StoreVar(td.Layer);
+            file.StoreVar(data[td.Name].Count);
+            foreach (TileData tile in data[td.Name])
             {
                 file.StoreVar(tile.Id);
                 file.StoreVar(tile.AtlasCoords.X);
@@ -52,7 +57,11 @@ public class PluginSaveHandler
         for (int i = 0; i < layerCount; i++)
         {
             string layer = (string)file.GetVar();
-            TerrainData td = new TerrainData(layer, new Color((string)file.GetVar()));
+            string color = (string)file.GetVar();
+            float biome = (float)file.GetVar();
+            float height = (float)file.GetVar();
+            int layerIndex = (int)file.GetVar();
+            TerrainData td = new TerrainData(layer, new Color(color), biome, height, layerIndex);
             terrainData.Add(td);
             int tileCount = (int)file.GetVar();
             List<TileData> tiles = new List<TileData>();

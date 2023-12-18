@@ -8,7 +8,22 @@ public partial class TerrainBlock : Control
     public Label TerrainNameLabel;
 
     [Export]
+    public Label LayerLabel;
+
+    [Export]
+    public Label BiomeLabel;
+
+    [Export]
+    public Label HeightLabel;
+
+    [Export]
+    public ColorRect TerrainColor;
+
+    [Export]
     public ColorRect TerrainBackground;
+
+    [Export]
+    private Button EditButton;
 
     [Signal]
     public delegate void TerrainBlockPressedEventHandler(TerrainBlock terrainBlock);
@@ -50,11 +65,27 @@ public partial class TerrainBlock : Control
         Selected = selected;
     }
 
-    public void SetData(string terrainName, Color color, Action<string, Color> OnEditTerrainPressed)
+    public void SetData(
+        string terrainName,
+        Color color,
+        string biome,
+        string height,
+        string layer,
+        Action<string, Color, string, string, string> OnEditTerrainPressed
+    )
     {
+        Name = terrainName;
         TerrainNameLabel.Text = terrainName; // TODO: We should replace all GetNode calls with this Export format
-        GetNode<ColorRect>("Vbox/Texture/Margin/HBox/TerrainColorRect").Color = color;
-        GetNode<Button>("Vbox/Texture/Margin/HBox/EditBtn").Pressed += () =>
-            OnEditTerrainPressed(terrainName, color);
+        TerrainColor.Color = color;
+        BiomeLabel.Text = "Biome: " + biome;
+        HeightLabel.Text = "Height: " + height;
+        LayerLabel.Text = "Layer: " + layer;
+
+        Button newEditButton = EditButton.Duplicate() as Button;
+        EditButton.GetParent().AddChild(newEditButton);
+        EditButton.QueueFree();
+        EditButton = newEditButton;
+
+        EditButton.Pressed += () => OnEditTerrainPressed(terrainName, color, biome, height, layer);
     }
 }

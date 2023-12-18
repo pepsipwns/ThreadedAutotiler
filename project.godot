@@ -18,9 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 NoiseHandler="*res://Scripts/Singletons/NoiseHandler.cs"
-MapGeneration="*res://Scenes/MapGeneration.tscn"
-TerrainHandler="*res://Scripts/Singletons/TerrainHandler.cs"
-Debug="*res://Scenes/Debug.tscn"
+MapGeneration="*res://addons/threaded_autotiler/Scripts/MapGeneration.cs"
 
 [dotnet]
 

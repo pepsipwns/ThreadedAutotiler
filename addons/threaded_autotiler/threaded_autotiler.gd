@@ -5,6 +5,7 @@ var dock : Control
 var button : Button
 
 func _enter_tree():
+	add_autoload_singleton("MapGeneration", "res://addons/threaded_autotiler/Scripts/MapGeneration.cs")
 	dock = preload("res://addons/threaded_autotiler/Scenes/Dock.tscn").instantiate()
 	button = add_control_to_bottom_panel(dock, "Autotile")
 	button.visible = false

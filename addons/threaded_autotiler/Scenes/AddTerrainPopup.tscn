@@ -2,26 +2,97 @@
 
 [ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/AddTerrainPopup.cs" id="1_kxwre"]
 
-[node name="AcceptDialog" type="AcceptDialog" node_paths=PackedStringArray("TerrainNameTextEdit")]
+[node name="AcceptDialog" type="AcceptDialog" node_paths=PackedStringArray("TerrainNameTextEdit", "TerrainColorPicker", "NoiseBiomeTextEdit", "NoiseHeightTextEdit", "LayerTextEdit")]
 title = "Add Terrain"
 initial_position = 2
-size = Vector2i(220, 100)
+size = Vector2i(260, 221)
 visible = true
 script = ExtResource("1_kxwre")
-TerrainNameTextEdit = NodePath("HBox/TerrainNameTextEdit")
+TerrainNameTextEdit = NodePath("VBox/HBox/TerrainNameTextEdit")
+TerrainColorPicker = NodePath("VBox/HBox/TerrainColorPicker")
+NoiseBiomeTextEdit = NodePath("VBox/HBox2/BiomeTextEdit")
+NoiseHeightTextEdit = NodePath("VBox/HBox2/HeightTextEdit")
+LayerTextEdit = NodePath("VBox/HBox/LayerTextEdit")
 
-[node name="HBox" type="HBoxContainer" parent="."]
+[node name="VBox" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = 8.0
 offset_top = 8.0
-offset_right = 212.0
-offset_bottom = 51.0
+offset_right = 252.0
+offset_bottom = 172.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
 
-[node name="TerrainNameTextEdit" type="TextEdit" parent="HBox"]
+[node name="HBox3" type="HBoxContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="VBox/HBox3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name"
+
+[node name="LayerLabel" type="Label" parent="VBox/HBox3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+text = "Layer"
+
+[node name="ColorLabel" type="Label" parent="VBox/HBox3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.3
+text = "Color"
+
+[node name="HBox" type="HBoxContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+
+[node name="TerrainNameTextEdit" type="TextEdit" parent="VBox/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Terrain Name"
 
-[node name="TerrainColorPicker" type="ColorPickerButton" parent="HBox"]
+[node name="LayerTextEdit" type="TextEdit" parent="VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+text = "0"
+
+[node name="TerrainColorPicker" type="ColorPickerButton" parent="VBox/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
+
+[node name="HBox4" type="HBoxContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+
+[node name="BiomeLabel" type="Label" parent="VBox/HBox4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Biome"
+
+[node name="HeightLabel" type="Label" parent="VBox/HBox4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Height"
+
+[node name="HBox2" type="HBoxContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+
+[node name="BiomeTextEdit" type="TextEdit" parent="VBox/HBox2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0.1"
+
+[node name="HeightTextEdit" type="TextEdit" parent="VBox/HBox2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0.0"
+placeholder_text = "height"

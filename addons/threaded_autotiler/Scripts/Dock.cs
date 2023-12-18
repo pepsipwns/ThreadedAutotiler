@@ -119,7 +119,11 @@ public partial class Dock : Control
             terrain.SetData(
                 terrainName,
                 _terrainData.FirstOrDefault(td => td.Name == terrainName).Color,
-                (name, color) => OnEditTerrainBtnPressed(name, color)
+                _terrainData.FirstOrDefault(td => td.Name == terrainName).Biome.ToString(),
+                _terrainData.FirstOrDefault(td => td.Name == terrainName).Height.ToString(),
+                _terrainData.FirstOrDefault(td => td.Name == terrainName).Layer.ToString(),
+                (name, color, biome, height, layer) =>
+                    OnEditTerrainBtnPressed(name, color, biome, height, layer)
             );
             terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
             _terrains.AddChild(terrain);
@@ -129,57 +133,121 @@ public partial class Dock : Control
 
     public void OnAddTerrainBtnPressed()
     {
-        AcceptDialog popup = AddTerrainPopupScene.Instantiate() as AcceptDialog;
+        AddTerrainPopup popup = AddTerrainPopupScene.Instantiate() as AddTerrainPopup;
         AddChild(popup);
         popup.PopupCentered();
         popup.Confirmed += () =>
         {
-            string text = popup.GetNode<TextEdit>("HBox/TerrainNameTextEdit").Text;
-            Color color = popup.GetNode<ColorPickerButton>("HBox/TerrainColorPicker").Color;
-            OnAddTerrainPopupConfirmed(text, color);
+            OnAddTerrainPopupConfirmed(popup);
         };
     }
 
-    public void OnAddTerrainPopupConfirmed(string name, Color color)
+    public void OnAddTerrainPopupConfirmed(AddTerrainPopup popup)
     {
+        string name = popup.TerrainNameTextEdit.Text;
+        Color color = popup.TerrainColorPicker.Color;
+        string biome = popup.NoiseBiomeTextEdit.Text;
+        string height = popup.NoiseHeightTextEdit.Text;
+        string layer = popup.LayerTextEdit.Text;
+
+        if (
+            !float.TryParse(biome, out float biomeValue)
+            || !float.TryParse(height, out float heightValue)
+            || !int.TryParse(layer, out int layerValue)
+        )
+        {
+            // Handle the case where biome or height cannot be parsed to a float
+            return;
+        }
         TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock; // Could be an issue
-        terrain.SetData(name, color, (name, color) => OnEditTerrainBtnPressed(name, color));
+        terrain.SetData(
+            name,
+            color,
+            biome,
+            height,
+            layer,
+            (name, color, biome, height, layer) =>
+                OnEditTerrainBtnPressed(name, color, biome, height, layer)
+        );
         terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
         _terrains.AddChild(terrain);
         _terrainBlocks.Add(terrain);
         _tileData.Add(name, new List<TileData>());
-        _terrainData.Add(new TerrainData(name, color));
+        _terrainData.Add(new TerrainData(name, color, biomeValue, heightValue, layerValue));
         SaveData();
     }
 
-    public void OnEditTerrainBtnPressed(string name, Color color)
+    public void OnEditTerrainBtnPressed(
+        string name,
+        Color color,
+        string biome,
+        string height,
+        string layer
+    )
     {
-        AcceptDialog popup = AddTerrainPopupScene.Instantiate() as AcceptDialog;
+        AddTerrainPopup popup = AddTerrainPopupScene.Instantiate() as AddTerrainPopup;
         popup.Title = "Edit Terrain";
-        popup.GetNode<TextEdit>("HBox/TerrainNameTextEdit").Text = name;
-        popup.GetNode<ColorPickerButton>("HBox/TerrainColorPicker").Color = color;
+        popup.SetData(name, color, biome, height, layer);
         AddChild(popup);
         popup.PopupCentered();
-        popup.Confirmed += () =>
-        {
-            string text = popup.GetNode<TextEdit>("HBox/TerrainNameTextEdit").Text;
-            Color color = popup.GetNode<ColorPickerButton>("HBox/TerrainColorPicker").Color;
-            OnEditTerrainPopupConfirmed(name, text, color);
-        };
+        popup.Confirmed += () => OnEditTerrainPopupConfirmed(name, popup);
     }
 
-    public void OnEditTerrainPopupConfirmed(string name, string newName, Color color)
+    public void OnEditTerrainPopupConfirmed(string name, AddTerrainPopup popup)
     {
-        Control terrain = _terrainBlocks.FirstOrDefault(t => t.Name == name);
-        terrain.GetNode<Label>("Vbox/Texture/Margin/HBox/TerrainNameLabel").Text = newName;
-        terrain.GetNode<ColorRect>("Vbox/Texture/Margin/HBox/TerrainColorRect").Color = color;
-        _terrainData.FirstOrDefault(td => td.Name == name).SetData(newName, color);
+        string newName = popup.TerrainNameTextEdit.Text;
+        Color color = popup.TerrainColorPicker.Color;
+        string biome = popup.NoiseBiomeTextEdit.Text;
+        string height = popup.NoiseHeightTextEdit.Text;
+        string layer = popup.LayerTextEdit.Text;
+        if (
+            !float.TryParse(biome, out float biomeValue)
+            || !float.TryParse(height, out float heightValue)
+            || !int.TryParse(layer, out int layerValue)
+        )
+        {
+            // Handle the case where biome or height cannot be parsed to a float
+            return;
+        }
+        TerrainBlock terrain = _terrainBlocks.FirstOrDefault(t => t.Name == name);
+        terrain.SetData(
+            newName,
+            color,
+            biome,
+            height,
+            layer,
+            (name, color, biome, height, layer) =>
+                OnEditTerrainBtnPressed(name, color, biome, height, layer)
+        );
+        if (name != newName)
+        {
+            _tileData.Add(newName, _tileData[name]);
+            _tileData.Remove(name);
+        }
+
+        _terrainData
+            .FirstOrDefault(td => td.Name == name)
+            .SetData(newName, color, biomeValue, heightValue, layerValue);
+        SaveData();
+    }
+
+    public void OnDeleteTerrainBtnPressed()
+    {
+        TerrainBlock terrain = _terrainBlocks.FirstOrDefault(t => t.Selected);
+        if (terrain == null)
+        {
+            return;
+        }
+        _terrainBlocks.Remove(terrain);
+        _terrains.RemoveChild(terrain);
+        _tileData.Remove(terrain.Name);
+        _terrainData.Remove(_terrainData.FirstOrDefault(td => td.Name == terrain.Name));
+        terrain.QueueFree();
         SaveData();
     }
 
     public void OnTerrainBlockPressed(TerrainBlock terrainBlock)
     {
-        GD.Print("Terrain block pressed");
         UnselectedLabel.Hide();
         if (terrainTilesPanel != null)
         {

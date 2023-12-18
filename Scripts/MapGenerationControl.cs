@@ -13,9 +13,15 @@ public partial class MapGenerationControl : Node2D
     [Export]
     bool GenerateOnThread = false;
 
+    [Export]
+    private int mapSize = 100;
+
+    [Export]
+    private bool useEdges = false;
+
     private Thread thread;
 
-    private Vector2I[][,] _atlasMap;
+    // private Vector2I[][,] _atlasMap;
 
     public void OnGeneratePressed()
     {
@@ -25,13 +31,20 @@ public partial class MapGenerationControl : Node2D
             {
                 return;
             }
-            thread = new Thread(() => MapGeneration.Instance.GenerateMap());
+            thread = new Thread(
+                () =>
+                    MapGeneration.Instance.GenerateMap(
+                        NoiseHandler.Instance.Noise,
+                        mapSize,
+                        useEdges
+                    )
+            );
             thread.Start();
         }
         else
         {
-            MapGeneration.Instance.GenerateMap();
-            GenerateTilemap();
+            MapGeneration.Instance.GenerateMap(NoiseHandler.Instance.Noise, mapSize, useEdges);
+            MapGeneration.Instance.GenerateTilemap(Tilemap);
         }
     }
 
@@ -49,22 +62,7 @@ public partial class MapGenerationControl : Node2D
         {
             LoadingLabel.Text = "Done!";
             thread = null;
-            GenerateTilemap();
-        }
-    }
-
-    private void GenerateTilemap()
-    {
-        _atlasMap = MapGeneration.Instance.TileAtlasMap;
-        for (int z = 0; z < _atlasMap.Length; z++)
-        {
-            for (int x = 0; x < MapGeneration.Instance.MapSize; x++)
-            {
-                for (int y = 0; y < MapGeneration.Instance.MapSize; y++)
-                {
-                    Tilemap.SetCell(z, new Vector2I(x, y), 0, _atlasMap[z][x, y]);
-                }
-            }
+            MapGeneration.Instance.GenerateTilemap(Tilemap);
         }
     }
 }
