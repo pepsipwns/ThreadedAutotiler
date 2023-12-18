@@ -20,7 +20,8 @@ In your map generation script, or perhaps your using this for chunking, whatever
 
 See https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_scripting.html for using these C# scripts in gdscript.
 
-**IMPORTANT** The MapGeneration class is an autoload singleton, which is accesible via MapGeneration.Instance... so each function, property I mention in the following will require MapGeneration.Instance. before it.
+**IMPORTANT** The MapGeneration class is an autoload singleton, which is accesible via `MapGeneration.Instance`... so each function, property I mention in the following will require `MapGeneration.Instance.` before it.
+
 1. GenerateMap(FastNoiseLite noise, int mapSize, bool useEdges)
      - FastNoiseLite being a noise you've generated before hand
      - mapSize being an integer for how many tiles i.e. 100 x 100
