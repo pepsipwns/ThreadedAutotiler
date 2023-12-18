@@ -375,7 +375,6 @@ offset_bottom = 55.0
 text = "Loading 0%"
 
 [node name="TileMap" type="TileMap" parent="."]
-position = Vector2(120, 120)
 tile_set = SubResource("TileSet_y2vwo")
 format = 2
 

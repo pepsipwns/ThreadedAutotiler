@@ -1,11 +1,18 @@
-[gd_scene format=3 uid="uid://bj757c1bscdg1"]
+[gd_scene load_steps=2 format=3 uid="uid://bj757c1bscdg1"]
 
-[node name="TerrainTilesPanel" type="VBoxContainer"]
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/TerrainTilesPanel.cs" id="1_agty2"]
+
+[node name="TerrainTilesPanel" type="VBoxContainer" node_paths=PackedStringArray("AddTileButton", "EditTileButton", "DeleteTileButton", "TileTextureParent")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_agty2")
+AddTileButton = NodePath("HBox/AddTileBtn")
+EditTileButton = NodePath("HBox/EditTileBtn")
+DeleteTileButton = NodePath("HBox/DeleteTileBtn")
+TileTextureParent = NodePath("GridBox")
 
 [node name="HBox" type="HBoxContainer" parent="."]
 layout_mode = 2

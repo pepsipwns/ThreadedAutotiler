@@ -5,6 +5,15 @@ using System;
 public partial class AddTilePopup : AcceptDialog
 {
     [Export]
+    public TextEdit XAtlasTextEdit;
+
+    [Export]
+    public TextEdit YAtlasTextEdit;
+
+    [Export]
+    public TextureRect TileTexture;
+
+    [Export]
     private ColorRect CenterHighlight;
 
     [Export]
@@ -92,9 +101,6 @@ public partial class AddTilePopup : AcceptDialog
         CenterHighlight.Color = SelectedColor;
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) { }
-
     public void OnTileModePressed(string name)
     {
         GD.Print("TileModePressed: " + name);
@@ -152,7 +158,21 @@ public partial class AddTilePopup : AcceptDialog
         return GetColorRectFromName(TileMode).GetNode<TextureButton>(TileMode).TextureNormal;
     }
 
-    public void SetTileMode(string tileMode)
+    public void SetData(
+        Vector2I atlasCoords,
+        string tileMode,
+        Texture2D texture,
+        Action<AddTilePopup, string, string> onAtlasCoordsChanged
+    )
+    {
+        SetTileMode(tileMode);
+        XAtlasTextEdit.Text = atlasCoords.X.ToString();
+        YAtlasTextEdit.Text = atlasCoords.Y.ToString();
+        TileTexture.Texture = texture;
+        SetupTextChanged(onAtlasCoordsChanged);
+    }
+
+    private void SetTileMode(string tileMode)
     {
         TileMode = tileMode;
         foreach (ColorRect highlight in Highlights)
@@ -162,24 +182,18 @@ public partial class AddTilePopup : AcceptDialog
         GetColorRectFromName(tileMode).Color = SelectedColor;
     }
 
-    public void SetData(
-        Vector2I atlasCoords,
-        string tileMode,
-        Texture2D texture,
-        Action onOkButtonPressed
-    )
+    public void Setup(string title = "Add Tile", string buttonText = "Add")
     {
-        TileMode = tileMode;
-        GetNode<TextEdit>("VBox/HBox/TextEditX").Text = atlasCoords.X.ToString();
-        GetNode<TextEdit>("VBox/HBox/TextEditY").Text = atlasCoords.Y.ToString();
-        GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture = texture;
-        GetNode<Button>("VBox/HBox/Button").Pressed += () => onOkButtonPressed();
+        PopupCentered();
+        Title = title;
+        OkButtonText = buttonText;
     }
 
-    public void GetNodes(out TextEdit textEditX, out TextEdit textEditY, out Button onAtlasOkButton)
+    public void SetupTextChanged(Action<AddTilePopup, string, string> OnAtlasCoordsChanged)
     {
-        textEditX = GetNode<TextEdit>("VBox/HBox/TextEditX");
-        textEditY = GetNode<TextEdit>("VBox/HBox/TextEditY");
-        onAtlasOkButton = GetNode<Button>("VBox/HBox/Button");
+        XAtlasTextEdit.TextChanged += () =>
+            OnAtlasCoordsChanged(this, XAtlasTextEdit.Text, YAtlasTextEdit.Text);
+        YAtlasTextEdit.TextChanged += () =>
+            OnAtlasCoordsChanged(this, XAtlasTextEdit.Text, YAtlasTextEdit.Text);
     }
 }

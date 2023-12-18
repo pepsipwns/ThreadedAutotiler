@@ -23,13 +23,16 @@
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_4j6kc"]
 gradient = SubResource("Gradient_ed35c")
 
-[node name="AddTilePopup" type="AcceptDialog" node_paths=PackedStringArray("CenterHighlight", "TopHighlight", "LeftHighlight", "RightHighlight", "BottomHighlight", "TLHighlight", "TRHighlight", "BRHighlight", "BLHighlight", "SingleDownHighlight", "SingleLeftHighlight", "SingleTopHighlight", "SingleRightHighlight", "UpDownHighlight", "LeftRightHighlight", "SingleHighlight")]
+[node name="AddTilePopup" type="AcceptDialog" node_paths=PackedStringArray("XAtlasTextEdit", "YAtlasTextEdit", "TileTexture", "CenterHighlight", "TopHighlight", "LeftHighlight", "RightHighlight", "BottomHighlight", "TLHighlight", "TRHighlight", "BRHighlight", "BLHighlight", "SingleDownHighlight", "SingleLeftHighlight", "SingleTopHighlight", "SingleRightHighlight", "UpDownHighlight", "LeftRightHighlight", "SingleHighlight")]
 title = "Add Tile"
 initial_position = 1
 size = Vector2i(208, 383)
 visible = true
 ok_button_text = "Add"
 script = ExtResource("1_mk5ut")
+XAtlasTextEdit = NodePath("VBox/HBox/TextEditX")
+YAtlasTextEdit = NodePath("VBox/HBox/TextEditY")
+TileTexture = NodePath("VBox/VBox/Margin/TileTexture")
 CenterHighlight = NodePath("VBox/Container/GridContainer/CenterHighlight")
 TopHighlight = NodePath("VBox/Container/GridContainer/TopHighlight")
 LeftHighlight = NodePath("VBox/Container/GridContainer/LeftHighlight")
@@ -64,16 +67,21 @@ text = "Atlas Coords"
 layout_mode = 2
 
 [node name="TextEditX" type="TextEdit" parent="VBox/HBox"]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
+text = "0"
 placeholder_text = "0"
 
 [node name="TextEditY" type="TextEdit" parent="VBox/HBox"]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
+text = "0"
 placeholder_text = "0"
 
 [node name="Button" type="Button" parent="VBox/HBox"]
+visible = false
 layout_mode = 2
 text = "OK"
 
@@ -86,7 +94,7 @@ size_flags_vertical = 3
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_bottom = 0
 
-[node name="Texture" type="TextureRect" parent="VBox/VBox/Margin"]
+[node name="TileTexture" type="TextureRect" parent="VBox/VBox/Margin"]
 texture_filter = 1
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2

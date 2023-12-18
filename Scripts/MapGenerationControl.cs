@@ -11,7 +11,7 @@ public partial class MapGenerationControl : Node2D
     TileMap Tilemap;
 
     [Export]
-    bool GenerateOnThread = false;
+    bool GenerateOnThread = true;
 
     [Export]
     private int mapSize = 100;
@@ -20,8 +20,6 @@ public partial class MapGenerationControl : Node2D
     private bool useEdges = false;
 
     private Thread thread;
-
-    // private Vector2I[][,] _atlasMap;
 
     public void OnGeneratePressed()
     {

@@ -96,7 +96,7 @@ public partial class Dock : Control
     private Vector2 Offset = new Vector2(0, 0);
 
     private GridContainer TileTextureParent;
-    private BoxContainer terrainTilesPanel;
+    private TerrainTilesPanel terrainTilesPanel;
 
     public override void _Ready()
     {
@@ -134,12 +134,12 @@ public partial class Dock : Control
     public void OnAddTerrainBtnPressed()
     {
         AddTerrainPopup popup = AddTerrainPopupScene.Instantiate() as AddTerrainPopup;
-        AddChild(popup);
-        popup.PopupCentered();
+        popup.Setup();
         popup.Confirmed += () =>
         {
             OnAddTerrainPopupConfirmed(popup);
         };
+        AddChild(popup);
     }
 
     public void OnAddTerrainPopupConfirmed(AddTerrainPopup popup)
@@ -186,11 +186,16 @@ public partial class Dock : Control
     )
     {
         AddTerrainPopup popup = AddTerrainPopupScene.Instantiate() as AddTerrainPopup;
-        popup.Title = "Edit Terrain";
-        popup.SetData(name, color, biome, height, layer);
+        popup.Setup("Edit Terrain", "Edit");
+        popup.SetData(
+            name,
+            color,
+            biome,
+            height,
+            layer,
+            () => OnEditTerrainPopupConfirmed(name, popup)
+        );
         AddChild(popup);
-        popup.PopupCentered();
-        popup.Confirmed += () => OnEditTerrainPopupConfirmed(name, popup);
     }
 
     public void OnEditTerrainPopupConfirmed(string name, AddTerrainPopup popup)
@@ -254,26 +259,26 @@ public partial class Dock : Control
             terrainTilesPanel.QueueFree();
         }
 
-        terrainTilesPanel = TerrainTilesPanel.Instantiate() as BoxContainer;
-        TileTextureParent = terrainTilesPanel.GetNode("GridBox") as GridContainer;
+        terrainTilesPanel = TerrainTilesPanel.Instantiate() as TerrainTilesPanel;
         foreach (TerrainBlock t in _terrainBlocks)
         {
             t.SetSelected(false);
         }
         terrainBlock.SetSelected(true);
-        terrainTilesPanel.GetNode<Button>("HBox/AddTileBtn").Pressed += () =>
-            OnAddTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
-        terrainTilesPanel.GetNode<Button>("HBox/EditTileBtn").Pressed += () =>
-            OnEditTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
-        terrainTilesPanel.GetNode<Button>("HBox/DeleteTileBtn").Pressed += () =>
-            OnDeleteTileBtnPressed(terrainBlock.TerrainNameLabel.Text);
+        GD.Print("terrainBlock.TerrainNameLabel.Text: " + terrainBlock.TerrainNameLabel.Text);
+        GD.Print("terrainTilesPanel: " + terrainTilesPanel);
+        terrainTilesPanel.SetData(
+            () => OnAddTileBtnPressed(terrainBlock.TerrainNameLabel.Text),
+            () => OnEditTileBtnPressed(terrainBlock.TerrainNameLabel.Text),
+            () => OnDeleteTileBtnPressed(terrainBlock.TerrainNameLabel.Text)
+        );
         TerrainTilesPanelParent.AddChild(terrainTilesPanel);
 
         foreach (TileTexture t in _tileBlocks)
         {
             t.QueueFree();
         }
-        TileTextureParent.GetChildren().Clear();
+        terrainTilesPanel.TileTextureParent.GetChildren().Clear();
 
         _tileBlocks.Clear();
         if (_tileData.ContainsKey(terrainBlock.TerrainNameLabel.Text))
@@ -294,7 +299,7 @@ public partial class Dock : Control
                     id
                 );
                 tileTexture.TileBlockPressed += (tile) => OnTileBlockPressed(tile);
-                TileTextureParent.AddChild(tileTexture);
+                terrainTilesPanel.TileTextureParent.AddChild(tileTexture);
 
                 _tileBlocks.Add(tileTexture);
             }
@@ -303,29 +308,26 @@ public partial class Dock : Control
 
     public void OnAddTileBtnPressed(string terrainName)
     {
-        GD.Print("ADD TILE");
         AddTilePopup addTilePopup = AddTilePopupScene.Instantiate() as AddTilePopup;
+        addTilePopup.Setup();
+        addTilePopup.SetupTextChanged(
+            (popup, textX, textY) => OnAtlasCoordsChanged(popup, textX, textY)
+        );
         AddChild(addTilePopup);
-        addTilePopup.PopupCentered();
-        addTilePopup.GetNodes(out TextEdit textX, out TextEdit textY, out Button atlasOkBtn);
-        atlasOkBtn.Pressed += () => OnAtlasOkBtnPressed(addTilePopup, textX.Text, textY.Text);
-        addTilePopup.Confirmed += () => OnAddTileBtnConfirmed(addTilePopup, terrainName);
     }
 
     private void OnAddTileBtnConfirmed(AddTilePopup addTilePopup, string terrainName)
     {
-        addTilePopup.GetNodes(out TextEdit textX, out TextEdit textY, out Button atlasOkBtn);
-        TextureRect textureRect = addTilePopup.GetNode<TextureRect>("VBox/VBox/Margin/Texture");
         if (
-            textureRect.Texture is GradientTexture2D
-            || !int.TryParse(textX.Text, out int xInt)
-            || !int.TryParse(textY.Text, out int yInt)
+            addTilePopup.TileTexture.Texture is GradientTexture2D
+            || !int.TryParse(addTilePopup.XAtlasTextEdit.Text, out int xInt)
+            || !int.TryParse(addTilePopup.YAtlasTextEdit.Text, out int yInt)
         )
         {
             return;
         }
         TileTexture tileTexture = TileTextureScene.Instantiate() as TileTexture;
-        tileTexture.SetTextures(textureRect.Texture, addTilePopup.GetCurrentTexture());
+        tileTexture.SetTextures(addTilePopup.TileTexture.Texture, addTilePopup.GetCurrentTexture());
         tileTexture.SetSelected(false);
         int id = GetNextAvailableId();
         tileTexture.SetData(new Vector2I(xInt, yInt), addTilePopup.TileMode, terrainName, id);
@@ -369,20 +371,18 @@ public partial class Dock : Control
         TileData tileData = _tileData[terrainName].FirstOrDefault(
             td => td.AtlasCoords == selectedTile.AtlasCoords
         );
-        addTilePopup.GetNodes(out TextEdit xEdit, out TextEdit yEdit, out Button atlasOkBtn);
         addTilePopup.SetData(
             tileData.AtlasCoords,
             tileData.TileMode,
             GetTextureFromAtlasCoords(tileData.AtlasCoords.X, tileData.AtlasCoords.Y),
-            () => OnAtlasOkBtnPressed(addTilePopup, xEdit.Text, yEdit.Text)
+            (popup, x, y) => OnAtlasCoordsChanged(popup, x, y)
         );
         addTilePopup.Confirmed += () =>
         {
-            TextureRect textureRect = addTilePopup.GetNode<TextureRect>("VBox/VBox/Margin/Texture");
             if (
-                textureRect.Texture is GradientTexture2D
-                || !int.TryParse(xEdit.Text, out int xInt)
-                || !int.TryParse(yEdit.Text, out int yInt)
+                addTilePopup.TileTexture.Texture is GradientTexture2D
+                || !int.TryParse(addTilePopup.XAtlasTextEdit.Text, out int xInt)
+                || !int.TryParse(addTilePopup.YAtlasTextEdit.Text, out int yInt)
             )
             {
                 return;
@@ -390,7 +390,10 @@ public partial class Dock : Control
             TileTexture tileTexture = _tileBlocks.FirstOrDefault(
                 t => t.TerrainName == terrainName && t.AtlasCoords == selectedTile.AtlasCoords
             );
-            tileTexture.SetTextures(textureRect.Texture, addTilePopup.GetCurrentTexture());
+            tileTexture.SetTextures(
+                addTilePopup.TileTexture.Texture,
+                addTilePopup.GetCurrentTexture()
+            );
             tileTexture.SetData(
                 new Vector2I(xInt, yInt),
                 addTilePopup.TileMode,
@@ -416,8 +419,8 @@ public partial class Dock : Control
 
     private void OnTileBlockPressed(TileTexture tile)
     {
-        terrainTilesPanel.GetNode<Button>("HBox/EditTileBtn").Disabled = false;
-        terrainTilesPanel.GetNode<Button>("HBox/DeleteTileBtn").Disabled = false;
+        terrainTilesPanel.EditTileButton.Disabled = false;
+        terrainTilesPanel.DeleteTileButton.Disabled = false;
         foreach (TileTexture t in _tileBlocks)
         {
             t.SetSelected(false);
@@ -428,7 +431,7 @@ public partial class Dock : Control
         );
     }
 
-    public void OnAtlasOkBtnPressed(AcceptDialog popup, string x, string y)
+    public void OnAtlasCoordsChanged(AddTilePopup popup, string x, string y)
     {
         if (!int.TryParse(x, out int xInt) || !int.TryParse(y, out int yInt))
         {
@@ -438,12 +441,11 @@ public partial class Dock : Control
         TileSetAtlasSource source = tileset.GetSource(0) as TileSetAtlasSource;
         if (source.HasTile(new Vector2I(xInt, yInt)))
         {
-            popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture =
-                GetTextureFromAtlasCoords(xInt, yInt);
+            popup.TileTexture.Texture = GetTextureFromAtlasCoords(xInt, yInt);
         }
         else
         {
-            popup.GetNode<TextureRect>("VBox/VBox/Margin/Texture").Texture = defaultTileTexture;
+            popup.TileTexture.Texture = defaultTileTexture;
         }
     }
 

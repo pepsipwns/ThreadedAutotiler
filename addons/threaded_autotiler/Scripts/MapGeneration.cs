@@ -124,7 +124,7 @@ public partial class MapGeneration : Node
             ushort[,] bitmasks = new ushort[mapSize, mapSize];
             for (int x = 0; x < mapSize; x++)
             {
-                StageProgress = (float)x / (float)mapSize;
+                StageProgress = (float)x / (float)mapSize * 100;
                 for (int y = 0; y < mapSize; y++)
                 {
                     if (!terrain[x, y])

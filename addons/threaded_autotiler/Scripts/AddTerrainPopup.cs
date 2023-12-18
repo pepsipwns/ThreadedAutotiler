@@ -34,12 +34,27 @@ public partial class AddTerrainPopup : AcceptDialog
         layer = LayerTextEdit.Text;
     }
 
-    public void SetData(string name, Color color, string biome, string height, string layer)
+    public void SetData(
+        string name,
+        Color color,
+        string biome,
+        string height,
+        string layer,
+        Action action
+    )
     {
         TerrainNameTextEdit.Text = name;
         TerrainColorPicker.Color = color;
         NoiseBiomeTextEdit.Text = biome;
         NoiseHeightTextEdit.Text = height;
         LayerTextEdit.Text = layer;
+        Confirmed += action;
+    }
+
+    public void Setup(string title = "Add Tile", string buttonText = "Add")
+    {
+        PopupCentered();
+        Title = title;
+        OkButtonText = buttonText;
     }
 }
