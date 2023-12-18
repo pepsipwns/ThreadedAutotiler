@@ -5,9 +5,10 @@
 After using other plugins and Godot's built in Terrain system, it was lacking for me to make my game work, so I decided to create a Auto Tiler which can run its calculations on a seperate thread.
 This allows me to run these calculations, and save the tilemap data to disk almost instantly, then when needed we can generate the Godot Tilemap with the generated TileAtlas data.
 
-## Example GIFs
+## Example Images / GIFs
+![image](https://github.com/pepsipwns/AutoTilerAtlas/assets/7117827/9b507e7b-36a2-4412-bdf2-6536781b8324)
 
-https://gyazo.com/2f295596cc092351f1a7717644d18197
+![image](https://gyazo.com/2f295596cc092351f1a7717644d18197)
 https://gyazo.com/4ae27c025183f3d42a6c552cc67ab018
 
 ## Usage (WIP)
