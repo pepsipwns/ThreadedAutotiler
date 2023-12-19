@@ -40,7 +40,7 @@ See https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_sc
       - 'TileAtlasMap', the array of TileAtlas values that will be used in the next step to generate the tilemap (probably unneeded by you).
   
 2. `GenerateTilemap(Tilemap tilemap)`
-       ``- Tilemap is the godot tilemap you want to generate onto.``
+       - Tilemap is the godot tilemap you want to generate onto.
      This cannot run on a seperate thread as its accessing the godot tilemaps and scene root.
      On large tilemaps this will be the bottleneck, so I advice you break it down into chunks and you wont experience lag!
 
