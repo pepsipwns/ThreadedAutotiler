@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://c64sak0srr3kp"]
-
-[ext_resource type="Script" path="res://Scripts/Singletons/MapGeneration.cs" id="1_d7p3t"]
-
-[node name="MapGeneration" type="Node2D"]
-script = ExtResource("1_d7p3t")
-MapSize = 500
-UseEdges = true
