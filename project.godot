@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 NoiseHandler="*res://Scripts/Singletons/NoiseHandler.cs"
-MapGeneration="*res://addons/threaded_autotiler/Scripts/MapGeneration.cs"
+MapGeneration="*res://addons/threaded_autotiler/Scenes/MapGeneration.tscn"
 
 [dotnet]
 

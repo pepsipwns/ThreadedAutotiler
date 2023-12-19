@@ -1,6 +1,5 @@
-[gd_scene load_steps=6 format=3 uid="uid://cda7o5qdqshyd"]
+[gd_scene load_steps=5 format=3 uid="uid://cda7o5qdqshyd"]
 
-[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/AtlasTextEdit.cs" id="1_78cki"]
 [ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/SetTilePanel.cs" id="1_r1pvw"]
 [ext_resource type="Texture2D" uid="uid://dq7l3x3lg13rw" path="res://addons/threaded_autotiler/Assets/Sprites/center.png" id="3_7y30r"]
 [ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="3_tipeo"]
@@ -74,15 +73,12 @@ layout_mode = 2
 text = "<
 "
 
-[node name="TextEditY" type="TextEdit" parent="MarginContainer/VBox/HBox" node_paths=PackedStringArray("Up", "Down")]
+[node name="TextEditY" type="TextEdit" parent="MarginContainer/VBox/HBox"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 placeholder_text = "0"
-script = ExtResource("1_78cki")
-Up = NodePath("../YUpBtn")
-Down = NodePath("../YDownBtn")
 
 [node name="YUpBtn" type="Button" parent="MarginContainer/VBox/HBox"]
 layout_mode = 2

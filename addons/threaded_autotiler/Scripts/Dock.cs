@@ -34,9 +34,6 @@ public partial class Dock : Control
     [Export]
     private PackedScene SetTilePanel;
 
-    // [Export]
-    // private PackedScene TileTextureScene;
-
     [Export]
     private Texture2D defaultTileTexture;
 
@@ -97,7 +94,6 @@ public partial class Dock : Control
 
     private Vector2 Offset = new Vector2(0, 0);
 
-    private GridContainer TileTextureParent;
     private TilesBitmaskPanel tilesBitmaskPanel;
 
     private SetTilePanel setTilePanel;
@@ -133,6 +129,11 @@ public partial class Dock : Control
             _terrains.AddChild(terrain);
             _terrainBlocks.Add(terrain);
         }
+    }
+
+    public void SetTileset(TileSet tileset)
+    {
+        this.tileset = tileset;
     }
 
     public void OnAddTerrainBtnPressed()
@@ -389,7 +390,7 @@ public partial class Dock : Control
             return;
         }
 
-        TileSetAtlasSource source = tileset.GetSource(0) as TileSetAtlasSource;
+        TileSetAtlasSource source = tileset.GetSource(tileset.GetSourceId(0)) as TileSetAtlasSource;
         if (source.HasTile(new Vector2I(xInt, yInt)))
         {
             setTilePanel.TileTexture.Texture = GetTextureFromAtlasCoords(xInt, yInt);
@@ -407,7 +408,7 @@ public partial class Dock : Control
 
     private AtlasTexture GetTextureFromAtlasCoords(int x, int y)
     {
-        TileSetAtlasSource source = tileset.GetSource(0) as TileSetAtlasSource;
+        TileSetAtlasSource source = tileset.GetSource(tileset.GetSourceId(0)) as TileSetAtlasSource;
         Rect2 rect = source.GetTileTextureRegion(new Vector2I(x, y), 0);
         Texture2D tilemapTexture = source.Texture;
         AtlasTexture a = new AtlasTexture { Atlas = tilemapTexture, Region = rect };

@@ -38,7 +38,6 @@ public partial class SetTilePanel : VBoxContainer
     {
         XUp.Pressed += () =>
         {
-            GD.Print("Up");
             int value = 0;
             int.TryParse(XAtlasTextEdit.Text, out value);
             value++;
@@ -46,14 +45,12 @@ public partial class SetTilePanel : VBoxContainer
         };
         XDown.Pressed += () =>
         {
-            GD.Print("Down");
             int value = 0;
             int.TryParse(XAtlasTextEdit.Text, out value);
             XAtlasTextEdit.Text = Mathf.Max(0, value - 1).ToString();
         };
         YUp.Pressed += () =>
         {
-            GD.Print("Up");
             int value = 0;
             int.TryParse(YAtlasTextEdit.Text, out value);
             value++;
@@ -61,7 +58,6 @@ public partial class SetTilePanel : VBoxContainer
         };
         YDown.Pressed += () =>
         {
-            GD.Print("Down");
             int value = 0;
             int.TryParse(YAtlasTextEdit.Text, out value);
             YAtlasTextEdit.Text = Mathf.Max(0, value - 1).ToString();
