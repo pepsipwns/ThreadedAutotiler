@@ -1,6 +1,10 @@
 using Godot;
 using System;
 
+/// <summary>
+/// This is a NoiseHandler singleton that should be added to autoload.
+/// Its a basic noise handler that uses FastNoiseLite to generate noise.
+/// </summary>
 public partial class NoiseHandler : Node
 {
     public FastNoiseLite Noise;
@@ -11,9 +15,6 @@ public partial class NoiseHandler : Node
         Instance = this;
         GenerateNoise();
     }
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) { }
 
     public void GenerateNoise()
     {

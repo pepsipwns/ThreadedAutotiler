@@ -1,6 +1,10 @@
 using Godot;
 using System;
 
+/// <summary>
+/// This handles the movement of the example sprite player.
+/// This is to demonstrate the threaded autotiler in action.
+/// </summary>
 public partial class DebugPlayer : Sprite2D
 {
     [Export]

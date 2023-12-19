@@ -2,6 +2,9 @@ using Godot;
 using System;
 using System.Threading;
 
+/// <summary>
+/// This is a control to handle the generation of the map in our example project. This shows how to use the functions in C#.
+/// </summary>
 public partial class MapGenerationControl : Node2D
 {
     [Export]

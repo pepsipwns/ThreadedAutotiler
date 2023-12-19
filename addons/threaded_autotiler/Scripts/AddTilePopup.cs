@@ -103,7 +103,6 @@ public partial class AddTilePopup : AcceptDialog
 
     public void OnTileModePressed(string name)
     {
-        GD.Print("TileModePressed: " + name);
         TileMode = name;
         foreach (ColorRect highlight in Highlights)
         {

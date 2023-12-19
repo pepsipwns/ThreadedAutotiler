@@ -12,8 +12,6 @@ public class PluginSaveHandler
     {
         using FileAccess file = FileAccess.Open(SaveFileName, FileAccess.ModeFlags.Write);
 
-        GD.Print("Saving data");
-
         List<TerrainData> sortedList = terrains.OrderBy(o => o.Layer).ToList();
         file.StoreVar(data.Count);
 
@@ -34,7 +32,6 @@ public class PluginSaveHandler
             }
         }
         file.Close();
-        GD.Print("Done saving data");
     }
 
     public static void LoadData(
@@ -42,7 +39,6 @@ public class PluginSaveHandler
         out List<TerrainData> terrainData
     )
     {
-        GD.Print("Loading data");
         using FileAccess file = FileAccess.Open(SaveFileName, FileAccess.ModeFlags.Read);
 
         terrainData = new List<TerrainData>();
@@ -83,7 +79,5 @@ public class PluginSaveHandler
 
             tileData[layer] = tiles;
         }
-
-        GD.Print("Done loading data");
     }
 }
