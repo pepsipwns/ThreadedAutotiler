@@ -1,4 +1,4 @@
-### Threaded Autotiler
+### Threaded Autotiler (HEAVILY WIP - probably errorring atm, example project works tho)
 
 ## Description
 
