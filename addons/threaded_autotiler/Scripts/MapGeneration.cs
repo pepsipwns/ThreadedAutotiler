@@ -292,10 +292,11 @@ public partial class MapGeneration : Node
                 return BitmaskStatic.SingleLeft;
             case "SingleRight":
                 return BitmaskStatic.SingleRight;
+            case "SingleBottom":
+            case "SingleDown":
+                return BitmaskStatic.SingleBottom;
             case "SingleTop":
                 return BitmaskStatic.SingleTop;
-            case "SingleBottom":
-                return BitmaskStatic.SingleBottom;
             case "Single":
                 return BitmaskStatic.Single;
             case "Center":

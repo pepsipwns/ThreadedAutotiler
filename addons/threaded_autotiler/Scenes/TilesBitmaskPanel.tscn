@@ -113,7 +113,7 @@ DefaultTexture = ExtResource("11_fns8o")
 [node name="GridUpDown" type="GridContainer" parent="MarginContainer/GridContainer"]
 layout_mode = 2
 
-[node name="SingleDown" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
+[node name="SingleTop" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("12_rs1im")
@@ -123,7 +123,7 @@ layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("13_pyi5w")
 
-[node name="SingleTop" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
+[node name="SingleDown" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("14_ycvft")

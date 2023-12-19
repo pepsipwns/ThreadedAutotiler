@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dq7l3x3lg13rw" path="res://addons/threaded_autotiler/Assets/Sprites/center.png" id="3_oyvug"]
 
 [node name="BitmaskButton" type="ColorRect"]
+texture_filter = 1
 custom_minimum_size = Vector2(48, 48)
 color = Color(0.211765, 0.239216, 0.290196, 1)
 script = ExtResource("1_de6fg")

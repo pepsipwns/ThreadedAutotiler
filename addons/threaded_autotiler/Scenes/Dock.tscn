@@ -13,7 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://nxuih8vrj6i2" path="res://addons/threaded_autotiler/Assets/Sprites/tr.png" id="12_2gf3k"]
 [ext_resource type="Texture2D" uid="uid://cxeimi4ip8gv3" path="res://addons/threaded_autotiler/Assets/Sprites/br.png" id="13_aorfj"]
 [ext_resource type="Texture2D" uid="uid://4jmyyuoxb84m" path="res://addons/threaded_autotiler/Assets/Sprites/bl.png" id="14_hyh8r"]
-[ext_resource type="Texture2D" uid="uid://csukh6fawnlux" path="res://addons/threaded_autotiler/Assets/Sprites/singlebottom.png" id="15_ttx8n"]
+[ext_resource type="Texture2D" uid="uid://csukh6fawnlux" path="res://addons/threaded_autotiler/Assets/Sprites/singlebottom.png" id="16_2ywmr"]
 [ext_resource type="Texture2D" uid="uid://b4kinavrhu0aq" path="res://addons/threaded_autotiler/Assets/Sprites/singleleft.png" id="16_olygi"]
 [ext_resource type="Texture2D" uid="uid://cqwopyona3c4k" path="res://addons/threaded_autotiler/Assets/Sprites/singletop.png" id="17_441ij"]
 [ext_resource type="Texture2D" uid="uid://c6yjsuogq8o3r" path="res://addons/threaded_autotiler/Assets/Sprites/singleright.png" id="18_f5lhc"]
@@ -58,7 +58,7 @@ TL = ExtResource("11_043nj")
 TR = ExtResource("12_2gf3k")
 BR = ExtResource("13_aorfj")
 BL = ExtResource("14_hyh8r")
-SingleDown = ExtResource("15_ttx8n")
+SingleDown = ExtResource("16_2ywmr")
 SingleLeft = ExtResource("16_olygi")
 SingleTop = ExtResource("17_441ij")
 SingleRight = ExtResource("18_f5lhc")

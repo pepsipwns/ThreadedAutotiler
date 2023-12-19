@@ -347,6 +347,10 @@ public partial class Dock : Control
         }
         else
         {
+            if (_tileData[terrainName].Any(t => t.TileMode == button.Name))
+            {
+                _tileData[terrainName].RemoveAll(t => t.TileMode == button.Name);
+            }
             _tileData[terrainName].Add(td);
         }
         SaveData();

@@ -7,9 +7,12 @@ public class BitmaskTile
 
     public Vector2I AtlasValue;
 
-    public BitmaskTile(Vector2I atlasValue, ushort bitmaskValue)
+    public double Chance;
+
+    public BitmaskTile(Vector2I atlasValue, ushort bitmaskValue, double chance = 100)
     {
         AtlasValue = atlasValue;
         BitmaskValue = bitmaskValue;
+        Chance = chance;
     }
 }
