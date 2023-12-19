@@ -1,5 +1,5 @@
 ### Threaded Autotiler
-
+## (HEAVILY WIP - probably errorring atm, example project works tho)
 ## Description
 
 After using other plugins and Godot's built in Terrain system, it was lacking for me to make my game work, so I decided to create a Auto Tiler which can run its calculations on a seperate thread.
