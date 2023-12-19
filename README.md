@@ -28,7 +28,7 @@ See https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_sc
 
 **IMPORTANT** The MapGeneration class is an autoload singleton, which is accesible via `MapGeneration.Instance`... so each function, property I mention in the following will require `MapGeneration.Instance.` before it.
 
-1. GenerateMap(FastNoiseLite noise, int mapSize, bool useEdges)
+1. `GenerateMap(FastNoiseLite noise, int mapSize, bool useEdges)`
      - FastNoiseLite being a noise you've generated before hand
      - mapSize being an integer for how many tiles i.e. 100 x 100
      - useEdges is a bool that if set to true will assume that map edges are 'true' or a continuation of the terrain, this is useful for chunking, although I need to think of a better solution.
@@ -39,9 +39,11 @@ See https://docs.godotengine.org/en/stable/tutorials/scripting/cross_language_sc
       - 'BitmaskMap', the actual value of the bitmask on each tile **(this is what you want to save to disk)** and the
       - 'TileAtlasMap', the array of TileAtlas values that will be used in the next step to generate the tilemap (probably unneeded by you).
   
-2. GenerateTilemap(Tilemap tilemap)
-       - Tilemap is the godot tilemap you want to generate onto.
-     This cannot run on a seperate thread as its accessing the godot tilemaps and scene root.
+2. `GenerateTilemap(Tilemap tilemap)`
+
+    - Tilemap is the godot tilemap you want to generate onto.
+    - Must be run after GenerateMap in step 1
+   This cannot run on a seperate thread as its accessing the godot tilemaps and scene root.
      On large tilemaps this will be the bottleneck, so I advice you break it down into chunks and you wont experience lag!
 
 ## Author
