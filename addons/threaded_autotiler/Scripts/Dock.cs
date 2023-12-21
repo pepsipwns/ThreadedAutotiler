@@ -13,9 +13,6 @@ public partial class Dock : Control
     [Export]
     private PackedScene AddTerrainPopupScene;
 
-    // [Export]
-    // private PackedScene SetTilePopupScene;
-
     [Export]
     private VBoxContainer _terrains;
 
@@ -29,7 +26,7 @@ public partial class Dock : Control
     private PackedScene TilesBitmaskPanel;
 
     [Export]
-    private ScrollContainer SetTilePanelParent;
+    private MarginContainer SetTilePanelParent;
 
     [Export]
     private PackedScene SetTilePanel;
@@ -90,7 +87,8 @@ public partial class Dock : Control
 
     private List<TerrainBlock> _terrainBlocks = new List<TerrainBlock>();
     private List<TerrainData> _terrainData = new List<TerrainData>();
-    private Dictionary<string, List<TileData>> _tileData = new Dictionary<string, List<TileData>>();
+    private Dictionary<string, List<List<TileData>>> _tileData =
+        new Dictionary<string, List<List<TileData>>>();
 
     private Vector2 Offset = new Vector2(0, 0);
 
@@ -161,10 +159,9 @@ public partial class Dock : Control
             || !int.TryParse(layer, out int layerValue)
         )
         {
-            // Handle the case where biome or height cannot be parsed to a float
             return;
         }
-        TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock; // Could be an issue
+        TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock;
         terrain.SetData(
             name,
             color,
@@ -177,7 +174,7 @@ public partial class Dock : Control
         terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
         _terrains.AddChild(terrain);
         _terrainBlocks.Add(terrain);
-        _tileData.Add(name, new List<TileData>());
+        _tileData.Add(name, new List<List<TileData>>());
         _terrainData.Add(new TerrainData(name, color, biomeValue, heightValue, layerValue));
         SaveData();
     }
@@ -216,7 +213,6 @@ public partial class Dock : Control
             || !int.TryParse(layer, out int layerValue)
         )
         {
-            // Handle the case where biome or height cannot be parsed to a float
             return;
         }
         TerrainBlock terrain = _terrainBlocks.FirstOrDefault(t => t.Name == name);
@@ -259,14 +255,8 @@ public partial class Dock : Control
     public void OnTerrainBlockPressed(TerrainBlock terrainBlock)
     {
         UnselectedLabel.Hide();
-        if (tilesBitmaskPanel != null && IsInstanceValid(tilesBitmaskPanel))
-        {
-            tilesBitmaskPanel.Free();
-        }
-        if (setTilePanel != null && IsInstanceValid(setTilePanel))
-        {
-            setTilePanel.Free();
-        }
+        FreePanel(tilesBitmaskPanel);
+        FreePanel(setTilePanel);
 
         tilesBitmaskPanel = TilesBitmaskPanel.Instantiate() as TilesBitmaskPanel;
         foreach (TerrainBlock t in _terrainBlocks)
@@ -276,18 +266,27 @@ public partial class Dock : Control
         terrainBlock.SetSelected(true);
         TilesBitmaskPanelParent.AddChild(tilesBitmaskPanel);
 
+        //Display any existing tile data for this terrain
         if (_tileData.ContainsKey(terrainBlock.TerrainNameLabel.Text))
         {
-            List<TileData> tileData = _tileData[terrainBlock.TerrainNameLabel.Text];
-            foreach (TileData td in tileData)
+            List<List<TileData>> tileData = _tileData[terrainBlock.TerrainNameLabel.Text];
+            if (tileData.Count > 0)
             {
-                tilesBitmaskPanel
-                    .GetBitmaskButtonFromTileMode(td.TileMode)
-                    .SetData(
-                        GetTextureFromAtlasCoords(td.AtlasCoords),
-                        td.AtlasCoords.X,
-                        td.AtlasCoords.Y
-                    );
+                foreach (List<TileData> tileVariants in tileData) // Display the first variant by default
+                {
+                    if (tileVariants.Count == 0)
+                    {
+                        continue;
+                    }
+                    TileData td = tileVariants[0];
+                    tilesBitmaskPanel
+                        .GetBitmaskButtonFromTileMode(td.TileMode)
+                        .SetData(
+                            GetTextureFromAtlasCoords(td.AtlasCoords),
+                            td.AtlasCoords.X,
+                            td.AtlasCoords.Y
+                        );
+                }
             }
         }
 
@@ -298,36 +297,108 @@ public partial class Dock : Control
         }
     }
 
-    public void OnEditTileBtnPressed(BitmaskButton button, string terrainName)
+    public void OnEditTileBtnPressed(
+        BitmaskButton button,
+        string terrainName,
+        int activeVariant = 0
+    )
     {
-        if (setTilePanel != null && IsInstanceValid(setTilePanel))
-        {
-            setTilePanel.Free();
-        }
+        FreePanel(setTilePanel);
         foreach (BitmaskButton b in tilesBitmaskPanel.Buttons)
         {
             b.SetSelected(false);
         }
         button.SetSelected(true);
         setTilePanel = SetTilePanel.Instantiate() as SetTilePanel;
-        bool isButtonSet = button.Button.TextureNormal != button.DefaultTexture;
+        _tileData.TryGetValue(terrainName, out List<List<TileData>> tileData);
+        //Get the array of List<TileData> that have TileMode = button.name
+        List<TileData> tileVariants = tileData.Find(
+            t => t.Count > 0 && t[0].TileMode == button.Name
+        );
+        if (tileVariants != null)
+        {
+            // Create a new tile for the active variant if it doesn't exist
+            if (tileVariants.Count <= activeVariant)
+            {
+                setTilePanel.SetData(button.DefaultTexture);
+                tileVariants.Add(
+                    new TileData(GetNextAvailableId(), new Vector2I(0, 0), button.Name)
+                );
+            }
+            //Otherwise display the active variant if it exists
+            else
+            {
+                TileData td = tileVariants[activeVariant];
+                setTilePanel.SetData(
+                    GetTextureFromAtlasCoords(td.AtlasCoords.X, td.AtlasCoords.Y),
+                    button.DefaultTexture,
+                    td.AtlasCoords.X,
+                    td.AtlasCoords.Y
+                );
+            }
+            // For each variant create a button
+            CreateVariantButtons(button, terrainName, tileVariants, activeVariant);
+            //Create the add button
+            setTilePanel.CreateVariantButton(
+                "+",
+                () => OnEditTileBtnPressed(button, terrainName, tileVariants.Count)
+            );
 
-        setTilePanel.SetData(
-            button.AtlasX,
-            button.AtlasY,
-            isButtonSet
-                ? GetTextureFromAtlasCoords(button.AtlasX, button.AtlasY)
-                : button.DefaultTexture,
-            button.DefaultTexture,
-            isButtonSet,
-            () => SetTileBitmask(setTilePanel, button, terrainName),
-            () => ClearTileBitmask(setTilePanel, button, terrainName),
+            setTilePanel.AlternateTileLabel.Visible = true;
+            if (activeVariant > 0)
+            {
+                setTilePanel.SetupChanceField(activeVariant, tileVariants, () => SaveData());
+            }
+        }
+        else // There is no tileVariants
+        {
+            setTilePanel.SetData(button.DefaultTexture);
+        }
+        setTilePanel.SetOnClicks(
+            () => SetTileBitmask(setTilePanel, button, terrainName, activeVariant),
+            () => ClearTileBitmask(button, terrainName, activeVariant),
             () => OnAtlasCoordsChanged(setTilePanel)
         );
+        SaveData();
         SetTilePanelParent.AddChild(setTilePanel);
     }
 
-    private void SetTileBitmask(SetTilePanel setTilePanel, BitmaskButton button, string terrainName)
+    private void OnAddAlternateTileButton(BitmaskButton button, string terrainName)
+    {
+        _tileData.TryGetValue(terrainName, out List<List<TileData>> tileData);
+        if (
+            tileData == null || tileData[0].FirstOrDefault(td => td.TileMode == button.Name) == null
+        )
+        {
+            GD.Print("No tileData or no tileData with TileMode " + button.Name);
+            return;
+        }
+        int variant = tileData.Count;
+    }
+
+    private void CreateVariantButtons(
+        BitmaskButton button,
+        string terrainName,
+        List<TileData> tileVariants,
+        int activeVariant
+    )
+    {
+        for (int x = 0; x < tileVariants.Count; x++)
+        {
+            setTilePanel.CreateVariantButton(x.ToString(), null, x == activeVariant);
+        }
+        foreach (Button b in setTilePanel.AlternateTileButtonParent.GetChildren())
+        {
+            b.Pressed += () => OnEditTileBtnPressed(button, terrainName, int.Parse(b.Text));
+        }
+    }
+
+    private void SetTileBitmask(
+        SetTilePanel setTilePanel,
+        BitmaskButton button,
+        string terrainName,
+        int variant = 0
+    )
     {
         if (
             setTilePanel.TileTexture.Texture == button.DefaultTexture
@@ -338,46 +409,100 @@ public partial class Dock : Control
             return;
         }
 
-        button.SetData(setTilePanel.TileTexture.Texture, xInt, yInt);
+        if (variant == 0)
+            button.SetData(setTilePanel.TileTexture.Texture, xInt, yInt);
         button.SetSelected(false);
-        TileData td = new TileData(GetNextAvailableId(), new Vector2I(xInt, yInt), button.Name);
-        if (!_tileData.ContainsKey(terrainName))
+
+        float.TryParse(setTilePanel.AlternateTileChanceTextEdit.Text, out float chance);
+        TileData td = new TileData(
+            GetNextAvailableId(),
+            new Vector2I(xInt, yInt),
+            button.Name,
+            float.IsNaN(chance) ? 100 : chance
+        );
+        if (!_tileData.ContainsKey(terrainName)) // Does the terrain contain any tileData yet?
         {
-            _tileData.Add(terrainName, new List<TileData> { td });
+            _tileData.Add(terrainName, new List<List<TileData>> { new List<TileData> { td } }); //Add this as a fresh list and array
         }
         else
         {
-            if (_tileData[terrainName].Any(t => t.TileMode == button.Name))
+            List<List<TileData>> tileData = _tileData[terrainName]; // It contains tileData, get the List of tiles
+            List<TileData> tileVariants = tileData.Find(
+                t => t.Count > 0 && t[0].TileMode == button.Name
+            ); // Does the tileData contain any tiles with this tileMode?
+            if (tileVariants == null)
             {
-                _tileData[terrainName].RemoveAll(t => t.TileMode == button.Name);
+                _tileData[terrainName].Add(new List<TileData> { td }); // If this is our first, add it as a new array
             }
-            _tileData[terrainName].Add(td);
+            else
+            {
+                if (tileVariants.Count < variant + 1) // Does the tileData contain this variant?
+                {
+                    tileVariants.Add(td); // If not, add it to the array
+                }
+                else
+                {
+                    tileVariants[variant] = td; // If so, replace it
+                }
+            }
         }
+        OnEditTileBtnPressed(button, terrainName, variant);
         SaveData();
     }
 
-    private void ClearTileBitmask(
-        SetTilePanel setTilePanel,
-        BitmaskButton button,
-        string terrainName
-    )
+    private void ClearTileBitmask(BitmaskButton button, string terrainName, int variant = 0)
     {
-        button.SetDefaults();
-        setTilePanel.QueueFree();
-        _tileData[terrainName].RemoveAll(td => td.TileMode == button.Name);
+        if (!_tileData.ContainsKey(terrainName))
+        {
+            return;
+        }
+        List<List<TileData>> tileData = _tileData[terrainName];
+        List<TileData> tileVariants = tileData.Find(
+            t => t.Count > 0 && t[0].TileMode == button.Name
+        );
+        if (tileVariants == null)
+        {
+            return;
+        }
+        tileVariants.RemoveAt(variant);
+
+        //If we are removing the first variant, and we still have variants remaining, make the next in line the new default with 100% chance.
+        if (variant == 0 && tileVariants.Count > 0)
+        {
+            TileData td = tileVariants[0];
+            td.Chance = 100;
+            BitmaskButton b = tilesBitmaskPanel.GetBitmaskButtonFromTileMode(td.TileMode);
+            b.SetData(
+                GetTextureFromAtlasCoords(td.AtlasCoords),
+                td.AtlasCoords.X,
+                td.AtlasCoords.Y
+            );
+        }
+
+        //If we are removing the first variant, and we have no variants remaining, remove the tileMode from the terrain and set button defaults.
+        if (tileVariants.Count == 0)
+        {
+            button.SetDefaults();
+            tileData.Remove(tileVariants);
+        }
+
         SaveData();
+        OnEditTileBtnPressed(button, terrainName);
     }
 
     private int GetNextAvailableId()
     {
         int id = 0;
-        foreach (List<TileData> tileData in _tileData.Values)
+        foreach (List<List<TileData>> tileData in _tileData.Values)
         {
-            foreach (TileData td in tileData)
+            foreach (List<TileData> tileVariants in tileData)
             {
-                if (td.Id >= id)
+                foreach (TileData td in tileVariants)
                 {
-                    id = td.Id + 1;
+                    if (td.Id >= id)
+                    {
+                        id = td.Id + 1;
+                    }
                 }
             }
         }
@@ -417,6 +542,14 @@ public partial class Dock : Control
         Texture2D tilemapTexture = source.Texture;
         AtlasTexture a = new AtlasTexture { Atlas = tilemapTexture, Region = rect };
         return a;
+    }
+
+    private void FreePanel(Node panel)
+    {
+        if (panel != null && IsInstanceValid(panel))
+        {
+            panel.QueueFree();
+        }
     }
 
     private Texture2D GetTextureFromName(string name)

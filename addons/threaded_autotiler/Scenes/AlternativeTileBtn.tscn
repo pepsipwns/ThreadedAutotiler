@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ddtbekanw53ij"]
+
+[node name="AlternativeTileBtn" type="Button"]
+mouse_default_cursor_shape = 2
+text = "1
+"

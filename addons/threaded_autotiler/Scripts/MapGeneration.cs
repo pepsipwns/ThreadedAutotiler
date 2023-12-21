@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 /// <summary>
@@ -21,7 +22,8 @@ public partial class MapGeneration : Node
     private int mapSize = 10;
     private bool useEdges = false;
 
-    private Dictionary<string, List<TileData>> _tileData = new Dictionary<string, List<TileData>>();
+    private Dictionary<string, List<List<TileData>>> _tileData =
+        new Dictionary<string, List<List<TileData>>>();
     private Dictionary<string, BitmaskTile[]> _bitmaskTiles =
         new Dictionary<string, BitmaskTile[]>();
 
@@ -252,13 +254,20 @@ public partial class MapGeneration : Node
     {
         foreach (TerrainData terrain in _terrainData)
         {
-            List<TileData> tileData = _tileData[terrain.Name];
+            List<List<TileData>> tileData = _tileData[terrain.Name];
             List<BitmaskTile> tiles = new List<BitmaskTile>();
-            foreach (TileData tile in tileData)
+            foreach (List<TileData> tile in tileData)
             {
-                tiles.Add(
-                    new BitmaskTile(tile.AtlasCoords, GetBitmaskValueFromStringName(tile.TileMode))
-                );
+                foreach (TileData tileVariant in tile)
+                {
+                    tiles.Add(
+                        new BitmaskTile(
+                            tileVariant.AtlasCoords,
+                            GetBitmaskValueFromStringName(tileVariant.TileMode),
+                            tileVariant.Chance
+                        )
+                    );
+                }
             }
             _bitmaskTiles.Add(terrain.Name, tiles.ToArray());
         }
@@ -307,25 +316,42 @@ public partial class MapGeneration : Node
 
     private Vector2I GetAtlasTile(string terrainName, ushort bitmask)
     {
-        foreach (BitmaskTile tile in _bitmaskTiles[terrainName])
+        List<BitmaskTile> tiles = _bitmaskTiles[terrainName]
+            .ToList()
+            .FindAll(tile => tile.BitmaskValue == bitmask);
+        if (tiles.Count > 0)
         {
-            if (tile.BitmaskValue == bitmask)
-            {
-                return tile.AtlasValue;
-            }
+            float random = new Random().Next(0, 100);
+            BitmaskTile[] tilesPassingChance = tiles
+                .FindAll(tile => tile.Chance > random)
+                .ToArray();
+            return tilesPassingChance.Length > 0
+                ? tilesPassingChance[new Random().Next(0, tilesPassingChance.Length)].AtlasValue
+                : tiles[0].AtlasValue;
         }
         if (bitmask > 0)
         {
-            foreach (TileData tile in _tileData[terrainName])
+            foreach (List<TileData> tile in _tileData[terrainName])
             {
-                if (tile.TileMode == "Center")
+                List<TileData> centerTile = tile.FindAll(
+                    tileVariant => tileVariant.TileMode == "Center"
+                );
+                if (centerTile.Count > 0)
                 {
-                    return tile.AtlasCoords;
+                    float random = new Random().Next(0, 100);
+                    List<TileData> tilesPassingChance = centerTile.FindAll(
+                        tile => tile.Chance > random
+                    );
+                    return tilesPassingChance.Count > 0
+                        ? tilesPassingChance[
+                            new Random().Next(0, tilesPassingChance.Count)
+                        ].AtlasCoords
+                        : centerTile[0].AtlasCoords;
                 }
             }
             if (_tileData[terrainName].Count > 0)
             {
-                return _tileData[terrainName][0].AtlasCoords;
+                return _tileData[terrainName][0][0].AtlasCoords;
             }
         }
 
