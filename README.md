@@ -14,17 +14,17 @@ https://gyazo.com/b6819b1f90f9f3b8f34d4e53a743d838
 
 ## Usage (WIP)
 
-1. First download the plugin. If you want to only use the plugin in a new game, copy only the 'addons/threaded_autotiler' folder. Otherwise you can get the full example project including an example game scene & usage.
-2. In order to load the plugin, with C# plugins you have to build the .NET project first weirdly before it will recognise the ThreadedAutotiler.cs script. Easiest way to do this is add a C# script to a node and build the project. Once thats done you should be able to load the plugin. (Let me know if anyone knows another workaround to this)
-3. Create your Tilemap & most importantly your TileSet. I would recommend creating any Layers you need now although its not essential.
-4. Select your TileSet/Tilemap and you should see the newly added 'Autotile' tab at the bottom dock section of the screen.
-5. Select 'Add Terrain' to add a new terrain, input a name and the height you would like this to show at (currently only height working, biome is WIP). Select a color just for organisation in the window.
-6. Now select your newly created terrain, and you will see the bitmask grid.
-7. Select a bitmask tile position to see the select tile panel.
-8. Create any custom bitmask you need with the + icon. **(New update)**
-9. Enter your tile's atlas positions, and press 'Set Tile'.
-10. Create any tile variants here for alternate tiles you want to show up, and set the chance they appear. **(New update)**
-11. Once your happy all  your tiles are in position, thats all we need to do here!
+- First download the plugin. If you want to only use the plugin in a new game, copy only the 'addons/threaded_autotiler' folder. Otherwise you can get the full example project including an example game scene & usage.
+- In order to load the plugin, with C# plugins you have to build the .NET project first weirdly before it will recognise the ThreadedAutotiler.cs script. Easiest way to do this is add a C# script to a node and build the project. Once thats done you should be able to load the plugin. (Let me know if anyone knows another workaround to this)
+- Create your Tilemap & most importantly your TileSet. I would recommend creating any Layers you need now although its not essential.
+- Select your TileSet/Tilemap and you should see the newly added 'Autotile' tab at the bottom dock section of the screen.
+- Select 'Add Terrain' to add a new terrain, input a name and the height you would like this to show at (currently only height working, biome is WIP). Select a color just for organisation in the window.
+- Now select your newly created terrain, and you will see the bitmask grid.
+- Select a bitmask tile position to see the select tile panel.
+- Create any custom bitmask you need with the + icon. **(New update)**
+- Enter your tile's atlas positions, and press 'Set Tile'.
+- Create any tile variants here for alternate tiles you want to show up, and set the chance they appear. **(New update)**
+- Once your happy all  your tiles are in position, thats all we need to do here!
 
 In your map generation script, or perhaps your using this for chunking, whatever! There are two functions (at the moment) which you need! I've used C# to build this plugin so all the functions are in C# currently.
 
