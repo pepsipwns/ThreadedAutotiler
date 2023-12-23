@@ -21,10 +21,10 @@ https://gyazo.com/b6819b1f90f9f3b8f34d4e53a743d838
 - 5. Select 'Add Terrain' to add a new terrain, input a name and the height you would like this to show at (currently only height working, biome is WIP). Select a color just for organisation in the window.
 - 6. Now select your newly created terrain, and you will see the bitmask grid.
 - 7. Select a bitmask tile position to see the select tile panel.
-- 7.5. Create any custom bitmask you need with the + icon. **(New update)**
+- 8. Create any custom bitmask you need with the + icon. **(New update)**
 - 9. Enter your tile's atlas positions, and press 'Set Tile'.
-- 8.5. Create any tile variants here  for alternate tiles you want to show up, and set the chance they appear. **(New update)**
-- 10. Once your happy all  your tiles are in position, thats all we need to do here!
+- 10. Create any tile variants here for alternate tiles you want to show up, and set the chance they appear. **(New update)**
+- 11. Once your happy all  your tiles are in position, thats all we need to do here!
 
 In your map generation script, or perhaps your using this for chunking, whatever! There are two functions (at the moment) which you need! I've used C# to build this plugin so all the functions are in C# currently.
 
