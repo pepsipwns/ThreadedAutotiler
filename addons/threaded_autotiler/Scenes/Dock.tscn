@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://237ptseftxyp"]
+[gd_scene load_steps=25 format=3 uid="uid://237ptseftxyp"]
 
 [ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/Dock.cs" id="1_baj4v"]
 [ext_resource type="PackedScene" uid="uid://bj0u1quofppsr" path="res://addons/threaded_autotiler/Scenes/Terrain.tscn" id="2_2ovly"]
@@ -20,6 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://7dnk3cdbj3m4" path="res://addons/threaded_autotiler/Assets/Sprites/updown.png" id="19_cjgml"]
 [ext_resource type="Texture2D" uid="uid://mjf6is4nq1t7" path="res://addons/threaded_autotiler/Assets/Sprites/leftright.png" id="20_ioqpd"]
 [ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="21_cxtvm"]
+[ext_resource type="PackedScene" uid="uid://b2cimnsbjs7td" path="res://addons/threaded_autotiler/Scenes/AddBitmaskPopup.tscn" id="22_r1brh"]
 [ext_resource type="PackedScene" uid="uid://cda7o5qdqshyd" path="res://addons/threaded_autotiler/Scenes/SetTilePanel.tscn" id="24_r3rbm"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ihgql"]
@@ -65,6 +66,7 @@ SingleRight = ExtResource("18_f5lhc")
 UpDown = ExtResource("19_cjgml")
 LeftRight = ExtResource("20_ioqpd")
 Single = ExtResource("21_cxtvm")
+AddBitmaskPopupScene = ExtResource("22_r1brh")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1

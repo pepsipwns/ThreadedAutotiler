@@ -75,7 +75,7 @@ public partial class TerrainBlock : Control
     )
     {
         Name = terrainName;
-        TerrainNameLabel.Text = terrainName; // TODO: We should replace all GetNode calls with this Export format
+        TerrainNameLabel.Text = terrainName;
         TerrainColor.Color = color;
         BiomeLabel.Text = "Biome: " + biome;
         HeightLabel.Text = "Height: " + height;

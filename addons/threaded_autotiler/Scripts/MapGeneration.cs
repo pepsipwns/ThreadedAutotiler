@@ -29,6 +29,9 @@ public partial class MapGeneration : Node
 
     private List<TerrainData> _terrainData = new List<TerrainData>();
 
+    private Dictionary<string, List<CustomBitmaskData>> _customBitmaskData =
+        new Dictionary<string, List<CustomBitmaskData>>();
+
     public override void _Ready()
     {
         Instance = this;
@@ -87,7 +90,7 @@ public partial class MapGeneration : Node
 
     private void LoadTerrainData()
     {
-        PluginSaveHandler.LoadData(out _tileData, out _terrainData);
+        PluginSaveHandler.LoadData(out _tileData, out _terrainData, out _customBitmaskData);
         TerrainMap = new bool[_terrainData.Count][,];
         BitmaskMap = new ushort[_terrainData.Count][,];
         TileAtlasMap = new Vector2I[_terrainData.Count][,];
@@ -263,7 +266,7 @@ public partial class MapGeneration : Node
                     tiles.Add(
                         new BitmaskTile(
                             tileVariant.AtlasCoords,
-                            GetBitmaskValueFromStringName(tileVariant.TileMode),
+                            GetBitmaskValueFromBitmaskArray(tileVariant.TileBitmasks),
                             tileVariant.Chance
                         )
                     );
@@ -271,6 +274,20 @@ public partial class MapGeneration : Node
             }
             _bitmaskTiles.Add(terrain.Name, tiles.ToArray());
         }
+    }
+
+    private ushort GetBitmaskValueFromBitmaskArray(bool[] bitmask)
+    {
+        return BitmaskConverter.ConvertTileToBitmask(
+            bitmask[1],
+            bitmask[7],
+            bitmask[3],
+            bitmask[5],
+            bitmask[0],
+            bitmask[2],
+            bitmask[6],
+            bitmask[8]
+        );
     }
 
     private ushort GetBitmaskValueFromStringName(string name)

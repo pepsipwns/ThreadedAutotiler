@@ -81,6 +81,9 @@ public partial class Dock : Control
 
     [Export]
     private Texture2D Single;
+
+    [Export]
+    private PackedScene AddBitmaskPopupScene;
     public TileSet tileset;
 
     public TileMap tilemap;
@@ -89,6 +92,9 @@ public partial class Dock : Control
     private List<TerrainData> _terrainData = new List<TerrainData>();
     private Dictionary<string, List<List<TileData>>> _tileData =
         new Dictionary<string, List<List<TileData>>>();
+
+    private Dictionary<string, List<CustomBitmaskData>> _customBitmaskData =
+        new Dictionary<string, List<CustomBitmaskData>>();
 
     private Vector2 Offset = new Vector2(0, 0);
 
@@ -105,15 +111,16 @@ public partial class Dock : Control
 
     public void SaveData()
     {
-        PluginSaveHandler.SaveData(_tileData, _terrainData);
+        PluginSaveHandler.SaveData(_tileData, _terrainData, _customBitmaskData);
     }
 
     public void LoadData()
     {
-        PluginSaveHandler.LoadData(out _tileData, out _terrainData);
+        PluginSaveHandler.LoadData(out _tileData, out _terrainData, out _customBitmaskData);
         foreach (string terrainName in _tileData.Keys)
         {
             TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock;
+            _terrains.AddChild(terrain);
             terrain.SetData(
                 terrainName,
                 _terrainData.FirstOrDefault(td => td.Name == terrainName).Color,
@@ -124,7 +131,6 @@ public partial class Dock : Control
                     OnEditTerrainBtnPressed(name, color, biome, height, layer)
             );
             terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
-            _terrains.AddChild(terrain);
             _terrainBlocks.Add(terrain);
         }
     }
@@ -137,12 +143,12 @@ public partial class Dock : Control
     public void OnAddTerrainBtnPressed()
     {
         AddTerrainPopup popup = AddTerrainPopupScene.Instantiate() as AddTerrainPopup;
+        AddChild(popup);
         popup.Setup();
         popup.Confirmed += () =>
         {
             OnAddTerrainPopupConfirmed(popup);
         };
-        AddChild(popup);
     }
 
     public void OnAddTerrainPopupConfirmed(AddTerrainPopup popup)
@@ -162,6 +168,7 @@ public partial class Dock : Control
             return;
         }
         TerrainBlock terrain = TerrainScene.Instantiate() as TerrainBlock;
+        _terrains.AddChild(terrain);
         terrain.SetData(
             name,
             color,
@@ -172,7 +179,6 @@ public partial class Dock : Control
                 OnEditTerrainBtnPressed(name, color, biome, height, layer)
         );
         terrain.TerrainBlockPressed += (terrain) => OnTerrainBlockPressed(terrain);
-        _terrains.AddChild(terrain);
         _terrainBlocks.Add(terrain);
         _tileData.Add(name, new List<List<TileData>>());
         _terrainData.Add(new TerrainData(name, color, biomeValue, heightValue, layerValue));
@@ -188,6 +194,7 @@ public partial class Dock : Control
     )
     {
         AddTerrainPopup popup = AddTerrainPopupScene.Instantiate() as AddTerrainPopup;
+        AddChild(popup);
         popup.Setup("Edit Terrain", "Edit");
         popup.SetData(
             name,
@@ -197,7 +204,6 @@ public partial class Dock : Control
             layer,
             () => OnEditTerrainPopupConfirmed(name, popup)
         );
-        AddChild(popup);
     }
 
     public void OnEditTerrainPopupConfirmed(string name, AddTerrainPopup popup)
@@ -259,12 +265,34 @@ public partial class Dock : Control
         FreePanel(setTilePanel);
 
         tilesBitmaskPanel = TilesBitmaskPanel.Instantiate() as TilesBitmaskPanel;
+        TilesBitmaskPanelParent.AddChild(tilesBitmaskPanel);
         foreach (TerrainBlock t in _terrainBlocks)
         {
             t.SetSelected(false);
         }
         terrainBlock.SetSelected(true);
-        TilesBitmaskPanelParent.AddChild(tilesBitmaskPanel);
+
+        foreach (BitmaskButton button in tilesBitmaskPanel.Buttons)
+        {
+            button.Button.Pressed += () =>
+                OnEditTileBtnPressed(button, terrainBlock.TerrainNameLabel.Text);
+        }
+
+        //Display any existing custom bitmasks for this terrain
+        if (_customBitmaskData.ContainsKey(terrainBlock.TerrainNameLabel.Text))
+        {
+            foreach (
+                CustomBitmaskData cbd in _customBitmaskData[terrainBlock.TerrainNameLabel.Text]
+            )
+            {
+                BitmaskButton c = tilesBitmaskPanel.CreateBitmaskButton(cbd.Name, cbd.Bitmasks);
+                c.Button.Pressed += () =>
+                {
+                    OnEditTileBtnPressed(c, terrainBlock.TerrainNameLabel.Text, 0, true);
+                };
+                tilesBitmaskPanel.Buttons.Add(c);
+            }
+        }
 
         //Display any existing tile data for this terrain
         if (_tileData.ContainsKey(terrainBlock.TerrainNameLabel.Text))
@@ -290,19 +318,139 @@ public partial class Dock : Control
             }
         }
 
-        foreach (BitmaskButton button in tilesBitmaskPanel.Buttons)
+        tilesBitmaskPanel.AddBitmaskButton.Button.Pressed += () =>
+            OnAddCustomBitmaskBtnPressed(terrainBlock.TerrainNameLabel.Text);
+    }
+
+    private void OnAddCustomBitmaskBtnPressed(
+        string terrainName,
+        string bitmaskName = null,
+        bool[] bitmasks = null,
+        string error = null,
+        bool editing = false
+    )
+    {
+        AddBitmaskPopup popup = AddBitmaskPopupScene.Instantiate() as AddBitmaskPopup;
+        AddChild(popup);
+        if (bitmaskName != null && bitmasks != null)
         {
-            button.Button.Pressed += () =>
-                OnEditTileBtnPressed(button, terrainBlock.TerrainNameLabel.Text);
+            popup.SetData(bitmaskName, bitmasks);
+        }
+        popup.SetError(error);
+        if (editing)
+        {
+            popup.Setup("Edit Custom Bitmask", "Edit");
+            popup.Confirmed += () =>
+                OnEditCustomBitmaskPopupConfirmed(popup, terrainName, bitmaskName);
+        }
+        else
+        {
+            popup.Setup();
+            popup.Confirmed += () => OnAddCustomBitmaskPopupConfirmed(popup, terrainName);
+        }
+    }
+
+    //TODO: Add a check to make sure the name & bitmasks are unique for this terrain
+    private void OnAddCustomBitmaskPopupConfirmed(AddBitmaskPopup popup, string terrainName)
+    {
+        string name = popup.BitmaskNameTextEdit.Text;
+        bool[] bitmasks = popup.BitmaskPositions;
+        if (name == "")
+        {
+            return;
+        }
+        foreach (BitmaskButton b in tilesBitmaskPanel.Buttons)
+        {
+            if (b.Name == name)
+            {
+                OnAddCustomBitmaskBtnPressed(
+                    terrainName,
+                    name,
+                    bitmasks,
+                    "This name already exists"
+                );
+                return;
+            }
+            if (b.Bitmasks.SequenceEqual(bitmasks))
+            {
+                OnAddCustomBitmaskBtnPressed(
+                    terrainName,
+                    name,
+                    bitmasks,
+                    "This bitmask already exists"
+                );
+                return;
+            }
+        }
+        if (!_customBitmaskData.ContainsKey(terrainName))
+        {
+            _customBitmaskData.Add(terrainName, new List<CustomBitmaskData>());
+        }
+        foreach (CustomBitmaskData cbd in _customBitmaskData[terrainName])
+        {
+            if (cbd.Name == name)
+            {
+                OnAddCustomBitmaskBtnPressed(
+                    terrainName,
+                    name,
+                    bitmasks,
+                    "This name already exists"
+                );
+                return;
+            }
+            if (cbd.Bitmasks.SequenceEqual(bitmasks))
+            {
+                OnAddCustomBitmaskBtnPressed(
+                    terrainName,
+                    name,
+                    bitmasks,
+                    "This bitmask already exists"
+                );
+                return;
+            }
+        }
+
+        _customBitmaskData[terrainName].Add(new CustomBitmaskData(name, bitmasks));
+        SaveData();
+        OnTerrainBlockPressed(_terrainBlocks.FirstOrDefault(t => t.Name == terrainName));
+    }
+
+    private void OnEditCustomBitmaskPopupConfirmed(
+        AddBitmaskPopup popup,
+        string terrainName,
+        string oldName
+    )
+    {
+        string name = popup.BitmaskNameTextEdit.Text;
+        bool[] bitmasks = popup.BitmaskPositions;
+        if (name == "")
+        {
+            return;
+        }
+        foreach (CustomBitmaskData cbd in _customBitmaskData[terrainName])
+        {
+            if (cbd.Name == oldName)
+            {
+                cbd.Bitmasks = bitmasks;
+                cbd.Name = name;
+                SaveData();
+                OnTerrainBlockPressed(_terrainBlocks.FirstOrDefault(t => t.Name == terrainName));
+                return;
+            }
         }
     }
 
     public void OnEditTileBtnPressed(
         BitmaskButton button,
         string terrainName,
-        int activeVariant = 0
+        int activeVariant = 0,
+        bool customBitmask = false
     )
     {
+        if (customBitmask)
+        {
+            CreateEditAndDeleteCustomBitmaskButtons(terrainName, button);
+        }
         FreePanel(setTilePanel);
         foreach (BitmaskButton b in tilesBitmaskPanel.Buttons)
         {
@@ -310,6 +458,7 @@ public partial class Dock : Control
         }
         button.SetSelected(true);
         setTilePanel = SetTilePanel.Instantiate() as SetTilePanel;
+        SetTilePanelParent.AddChild(setTilePanel);
         _tileData.TryGetValue(terrainName, out List<List<TileData>> tileData);
         //Get the array of List<TileData> that have TileMode = button.name
         List<TileData> tileVariants = tileData.Find(
@@ -322,7 +471,12 @@ public partial class Dock : Control
             {
                 setTilePanel.SetData(button.DefaultTexture);
                 tileVariants.Add(
-                    new TileData(GetNextAvailableId(), new Vector2I(0, 0), button.Name)
+                    new TileData(
+                        GetNextAvailableId(),
+                        new Vector2I(0, 0),
+                        button.Name,
+                        button.Bitmasks
+                    )
                 );
             }
             //Otherwise display the active variant if it exists
@@ -360,7 +514,34 @@ public partial class Dock : Control
             () => OnAtlasCoordsChanged(setTilePanel)
         );
         SaveData();
-        SetTilePanelParent.AddChild(setTilePanel);
+    }
+
+    private void CreateEditAndDeleteCustomBitmaskButtons(string terrainName, BitmaskButton button)
+    {
+        tilesBitmaskPanel.EditBitmaskButtonParent
+            .GetChildren()
+            .Cast<Button>()
+            .ToList()
+            .ForEach(b => b.QueueFree());
+        Button editBtn = new Button { Text = "Edit" };
+        tilesBitmaskPanel.EditBitmaskButtonParent.AddChild(editBtn);
+        editBtn.Pressed += () =>
+            OnAddCustomBitmaskBtnPressed(terrainName, button.Name, button.Bitmasks, null, true);
+        Button deleteBtn = new Button { Text = "Delete" };
+        tilesBitmaskPanel.EditBitmaskButtonParent.AddChild(deleteBtn);
+        deleteBtn.Pressed += () =>
+        {
+            _customBitmaskData[terrainName].Remove(
+                _customBitmaskData[terrainName].FirstOrDefault(cbd => cbd.Name == button.Name)
+            );
+            //TODO: Delete tiledata associated with this custom bitmask
+            _tileData[terrainName].ForEach(tileVariants =>
+            {
+                tileVariants.RemoveAll(td => td.TileMode == button.Name);
+            });
+            SaveData();
+            OnTerrainBlockPressed(_terrainBlocks.FirstOrDefault(t => t.Name == terrainName));
+        };
     }
 
     private void OnAddAlternateTileButton(BitmaskButton button, string terrainName)
@@ -370,7 +551,6 @@ public partial class Dock : Control
             tileData == null || tileData[0].FirstOrDefault(td => td.TileMode == button.Name) == null
         )
         {
-            GD.Print("No tileData or no tileData with TileMode " + button.Name);
             return;
         }
         int variant = tileData.Count;
@@ -418,6 +598,7 @@ public partial class Dock : Control
             GetNextAvailableId(),
             new Vector2I(xInt, yInt),
             button.Name,
+            button.Bitmasks,
             float.IsNaN(chance) ? 100 : chance
         );
         if (!_tileData.ContainsKey(terrainName)) // Does the terrain contain any tileData yet?

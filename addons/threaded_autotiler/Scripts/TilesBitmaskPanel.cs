@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 [Tool]
 public partial class TilesBitmaskPanel : VBoxContainer
@@ -52,12 +53,28 @@ public partial class TilesBitmaskPanel : VBoxContainer
     [Export]
     public BitmaskButton SingleBitmaskButton;
 
-    public BitmaskButton[] Buttons;
+    [Export]
+    public GridContainer BitmaskButtonParent;
+
+    [Export]
+    public BitmaskButton AddBitmaskButton;
+
+    [Export]
+    public PackedScene CustomBitmaskButton;
+
+    [Export]
+    public BoxContainer EditBitmaskButtonParent;
+
+    public List<BitmaskButton> Buttons;
+
+    private static Color SelectedColor = new Color("#ff0000");
+
+    private static Color DefaultColor = new Color("#000000");
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        Buttons = new BitmaskButton[]
+        Buttons = new List<BitmaskButton>
         {
             BLBitmaskButton,
             BottomBitmaskButton,
@@ -78,54 +95,40 @@ public partial class TilesBitmaskPanel : VBoxContainer
         };
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) { }
+    public BitmaskButton CreateBitmaskButton(string name, bool[] bitmasks)
+    {
+        BitmaskButton button = CustomBitmaskButton.Instantiate() as BitmaskButton;
+        BitmaskButtonParent.AddChild(button);
+        BitmaskButtonParent.MoveChild(button, 0);
+        SetBitmaskTexture(button, bitmasks);
+        button.Name = name;
+        button.Bitmasks = bitmasks;
+        return button;
+    }
+
+    public void SetBitmaskTexture(BitmaskButton button, bool[] bitmasks)
+    {
+        Image image = Image.Create(3, 3, false, Image.Format.Rgba8);
+        for (int i = 0; i < 9; i++)
+        {
+            int x = i % 3;
+            int y = i / 3;
+            image.SetPixel(x, y, bitmasks[i] ? SelectedColor : DefaultColor);
+        }
+        ImageTexture texture = ImageTexture.CreateFromImage(image);
+        button.DefaultTexture = texture;
+        button.Button.TextureNormal = texture;
+    }
 
     public BitmaskButton GetBitmaskButtonFromTileMode(string mode)
     {
-        switch (mode)
+        foreach (BitmaskButton button in Buttons)
         {
-            case "BL":
-                return BLBitmaskButton;
-            case "Bottom":
-                return BottomBitmaskButton;
-            case "BR":
-                return BRBitmaskButton;
-            case "Left":
-                return LeftBitmaskButton;
-            case "Center":
-                return CenterBitmaskButton;
-            case "Right":
-                return RightBitmaskButton;
-            case "TL":
-                return TLBitmaskButton;
-            case "Top":
-                return TopBitmaskButton;
-            case "TR":
-                return TRBitmaskButton;
-            case "SingleLeft":
-                return SingleLeftBitmaskButton;
-            case "LeftRight":
-                return LeftRightBitmaskButton;
-            case "SingleRight":
-                return SingleRightBitmaskButton;
-            case "SingleTop":
-                return SingleUpBitmaskButton;
-            case "UpDown":
-                return TopBottomBitmaskButton;
-            case "SingleDown":
-                return SingleDownBitmaskButton;
-            case "Single":
-                return SingleBitmaskButton;
-            default:
+            if (button.Name == mode)
             {
-                GD.PrintErr(
-                    "[Threaded Autotiler] GetBitmaskButtonFromTileMode returned null with mode ["
-                        + mode
-                        + "]"
-                );
-                return null;
+                return button;
             }
         }
+        return null;
     }
 }

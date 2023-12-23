@@ -23,8 +23,8 @@ public partial class NoiseHandler : Node
         Noise = new FastNoiseLite
         {
             NoiseType = FastNoiseLite.NoiseTypeEnum.Perlin,
-            Seed = 1000,
-            Frequency = 0.014f
+            Seed = new Random().Next(0, 1000),
+            Frequency = 0.018f
         };
     }
 

@@ -1,11 +1,26 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 [Tool]
 public partial class BitmaskButton : ColorRect
 {
     [Export]
     public Texture2D DefaultTexture;
+
+    [Export]
+    public Godot.Collections.Array<bool> DefaultBitmask = new Godot.Collections.Array<bool>()
+    {
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+    };
 
     private Color defaultColor = new Color("#363d4a");
     private Color selectedColor = new Color("#5ca55b");
@@ -19,12 +34,19 @@ public partial class BitmaskButton : ColorRect
     public int AtlasX;
     public int AtlasY;
 
+    public bool[] Bitmasks;
+
     public override void _Ready()
     {
         TileModeTexture = GetNode<TextureRect>("TileModeTexture");
         Button = GetNode<TextureButton>("Button");
         Button.TextureNormal = DefaultTexture;
         SetSelected(false);
+        Bitmasks = new bool[9];
+        for (int i = 0; i < 9; i++)
+        {
+            Bitmasks[i] = DefaultBitmask[i];
+        }
     }
 
     public void SetSelected(bool selected)

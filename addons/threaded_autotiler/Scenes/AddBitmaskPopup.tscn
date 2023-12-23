@@ -1,0 +1,68 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2cimnsbjs7td"]
+
+[ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/AddBitmaskPopup.cs" id="1_oukmh"]
+[ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="1_y87wk"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ywx6q"]
+font_size = 14
+font_color = Color(0.862745, 0.207843, 0.294118, 1)
+
+[node name="AddBitmaskPopup" type="AcceptDialog" node_paths=PackedStringArray("BitmaskTexture", "BitmaskNameTextEdit", "ErrorLabel")]
+title = "Add Bitmask"
+initial_position = 2
+size = Vector2i(260, 403)
+visible = true
+ok_button_text = "Add"
+script = ExtResource("1_oukmh")
+BitmaskTexture = NodePath("VBox/MarginContainer/TextureRect")
+BitmaskNameTextEdit = NodePath("VBox/BitmaskNameTextEdit")
+ErrorLabel = NodePath("VBox/ErrorLabel")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 252.0
+offset_bottom = 354.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="NameLabel" type="Label" parent="VBox"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name (must be unique)"
+
+[node name="BitmaskNameTextEdit" type="TextEdit" parent="VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "BitmaskName"
+
+[node name="MarginContainer" type="MarginContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="TextureRect" type="TextureRect" parent="VBox/MarginContainer"]
+texture_filter = 1
+custom_minimum_size = Vector2(180, 180)
+layout_mode = 2
+texture = ExtResource("1_y87wk")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="ErrorLabel" type="Label" parent="VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Error"
+label_settings = SubResource("LabelSettings_ywx6q")
+horizontal_alignment = 1

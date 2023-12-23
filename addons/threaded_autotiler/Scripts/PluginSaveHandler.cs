@@ -10,7 +10,8 @@ public class PluginSaveHandler
 
     public static void SaveData(
         Dictionary<string, List<List<TileData>>> data,
-        List<TerrainData> terrains
+        List<TerrainData> terrains,
+        Dictionary<string, List<CustomBitmaskData>> _customBitmaskData
     )
     {
         using FileAccess file = FileAccess.Open(SaveFileName, FileAccess.ModeFlags.Write);
@@ -36,6 +37,28 @@ public class PluginSaveHandler
                     file.StoreVar(tileVariant.AtlasCoords.Y); // Tile Atlas Y
                     file.StoreVar(tileVariant.TileMode); // Tile Mode
                     file.StoreVar(tileVariant.Chance); // Tile Chance
+                    file.StoreVar(tileVariant.TileBitmasks.Length); // Tile Bitmask Length
+                    foreach (bool bitmask in tileVariant.TileBitmasks)
+                    {
+                        file.StoreVar(bitmask); // Tile Bitmask
+                    }
+                }
+            }
+            file.StoreVar(_customBitmaskData.ContainsKey(td.Name));
+            if (_customBitmaskData.ContainsKey(td.Name))
+            {
+                file.StoreVar(_customBitmaskData[td.Name].Count); // Custom Bitmask Count
+                foreach (List<CustomBitmaskData> customBitmaskData in _customBitmaskData.Values)
+                {
+                    foreach (CustomBitmaskData cbd in customBitmaskData)
+                    {
+                        file.StoreVar(cbd.Name); // Custom Bitmask Name
+                        file.StoreVar(cbd.Bitmasks.Length); // Custom Bitmask Length
+                        foreach (bool bitmask in cbd.Bitmasks)
+                        {
+                            file.StoreVar(bitmask); // Custom Bitmask
+                        }
+                    }
                 }
             }
         }
@@ -44,13 +67,15 @@ public class PluginSaveHandler
 
     public static void LoadData(
         out Dictionary<string, List<List<TileData>>> tileData,
-        out List<TerrainData> terrainData
+        out List<TerrainData> terrainData,
+        out Dictionary<string, List<CustomBitmaskData>> _customBitmaskData
     )
     {
         using FileAccess file = FileAccess.Open(SaveFileName, FileAccess.ModeFlags.Read);
 
         terrainData = new List<TerrainData>();
         tileData = new Dictionary<string, List<List<TileData>>>();
+        _customBitmaskData = new Dictionary<string, List<CustomBitmaskData>>();
 
         if (file == null || file.GetLength() == 0)
         {
@@ -81,13 +106,38 @@ public class PluginSaveHandler
                     int atlasY = (int)file.GetVar(); // Tile Atlas Y
                     string tileMode = (string)file.GetVar(); // Tile Mode
                     float chance = (float)file.GetVar(); // Tile Chance
+                    int bitmaskLength = (int)file.GetVar(); // Tile Bitmask Length
+                    bool[] bitmasks = new bool[bitmaskLength];
+                    for (int z = 0; z < bitmaskLength; z++)
+                    {
+                        bitmasks[z] = (bool)file.GetVar(); // Tile Bitmask
+                    }
                     tileVariants.Add(
-                        new TileData(id, new Vector2I(atlasX, atlasY), tileMode, chance)
+                        new TileData(id, new Vector2I(atlasX, atlasY), tileMode, bitmasks, chance)
                     );
                 }
                 tiles.Add(tileVariants);
             }
             tileData[name] = tiles;
+
+            bool hasCustomBitmask = (bool)file.GetVar();
+            if (hasCustomBitmask)
+            {
+                int customBitmaskCount = (int)file.GetVar(); // Custom Bitmask Count
+                List<CustomBitmaskData> customBitmaskData = new List<CustomBitmaskData>();
+                for (int x = 0; x < customBitmaskCount; x++)
+                {
+                    string customBitmaskName = (string)file.GetVar(); // Custom Bitmask Name
+                    int customBitmaskLength = (int)file.GetVar(); // Custom Bitmask Length
+                    bool[] customBitmask = new bool[customBitmaskLength];
+                    for (int y = 0; y < customBitmaskLength; y++)
+                    {
+                        customBitmask[y] = (bool)file.GetVar(); // Custom Bitmask
+                    }
+                    customBitmaskData.Add(new CustomBitmaskData(customBitmaskName, customBitmask));
+                }
+                _customBitmaskData[name] = customBitmaskData;
+            }
         }
     }
 }

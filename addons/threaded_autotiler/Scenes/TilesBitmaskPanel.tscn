@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://ds2d2eupda4ux"]
+[gd_scene load_steps=19 format=3 uid="uid://ds2d2eupda4ux"]
 
 [ext_resource type="Script" path="res://addons/threaded_autotiler/Scripts/TilesBitmaskPanel.cs" id="1_gv014"]
 [ext_resource type="PackedScene" uid="uid://briy52yfwc3rx" path="res://addons/threaded_autotiler/Scenes/BitmaskButton.tscn" id="2_y7qi4"]
@@ -17,8 +17,9 @@
 [ext_resource type="Texture2D" uid="uid://mjf6is4nq1t7" path="res://addons/threaded_autotiler/Assets/Sprites/leftright.png" id="16_utgin"]
 [ext_resource type="Texture2D" uid="uid://c6yjsuogq8o3r" path="res://addons/threaded_autotiler/Assets/Sprites/singleright.png" id="17_8515p"]
 [ext_resource type="Texture2D" uid="uid://co73ofvi73iau" path="res://addons/threaded_autotiler/Assets/Sprites/single.png" id="18_8jnbj"]
+[ext_resource type="Texture2D" uid="uid://2ymy8ij688y8" path="res://addons/threaded_autotiler/Assets/Sprites/add.png" id="18_cjtb2"]
 
-[node name="TilesBitmaskPanel" type="VBoxContainer" node_paths=PackedStringArray("BLBitmaskButton", "BottomBitmaskButton", "BRBitmaskButton", "LeftBitmaskButton", "CenterBitmaskButton", "RightBitmaskButton", "TLBitmaskButton", "TopBitmaskButton", "TRBitmaskButton", "SingleLeftBitmaskButton", "LeftRightBitmaskButton", "SingleRightBitmaskButton", "SingleUpBitmaskButton", "TopBottomBitmaskButton", "SingleDownBitmaskButton", "SingleBitmaskButton")]
+[node name="TilesBitmaskPanel" type="VBoxContainer" node_paths=PackedStringArray("BLBitmaskButton", "BottomBitmaskButton", "BRBitmaskButton", "LeftBitmaskButton", "CenterBitmaskButton", "RightBitmaskButton", "TLBitmaskButton", "TopBitmaskButton", "TRBitmaskButton", "SingleLeftBitmaskButton", "LeftRightBitmaskButton", "SingleRightBitmaskButton", "SingleUpBitmaskButton", "TopBottomBitmaskButton", "SingleDownBitmaskButton", "SingleBitmaskButton", "BitmaskButtonParent", "AddBitmaskButton", "EditBitmaskButtonParent")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -28,128 +29,170 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 theme_override_constants/separation = -6
 script = ExtResource("1_gv014")
-BLBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/BL")
-BottomBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/Bottom")
-BRBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/BR")
-LeftBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/Left")
-CenterBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/Center")
-RightBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/Right")
-TLBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/TL")
-TopBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/Top")
-TRBitmaskButton = NodePath("MarginContainer/GridContainer/GridMain/TR")
-SingleLeftBitmaskButton = NodePath("MarginContainer/GridContainer/GridLeftRight/SingleLeft")
-LeftRightBitmaskButton = NodePath("MarginContainer/GridContainer/GridLeftRight/LeftRight")
-SingleRightBitmaskButton = NodePath("MarginContainer/GridContainer/GridLeftRight/SingleRight")
-SingleUpBitmaskButton = NodePath("MarginContainer/GridContainer/GridUpDown/SingleTop")
-TopBottomBitmaskButton = NodePath("MarginContainer/GridContainer/GridUpDown/UpDown")
-SingleDownBitmaskButton = NodePath("MarginContainer/GridContainer/GridUpDown/SingleDown")
-SingleBitmaskButton = NodePath("MarginContainer/GridContainer/Single")
+BLBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/BL")
+BottomBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/Bottom")
+BRBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/BR")
+LeftBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/Left")
+CenterBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/Center")
+RightBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/Right")
+TLBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/TL")
+TopBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/Top")
+TRBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain/TR")
+SingleLeftBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridLeftRight/SingleLeft")
+LeftRightBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridLeftRight/LeftRight")
+SingleRightBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridLeftRight/SingleRight")
+SingleUpBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridUpDown/SingleTop")
+TopBottomBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridUpDown/UpDown")
+SingleDownBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridUpDown/SingleDown")
+SingleBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/GridContainer/Single")
+BitmaskButtonParent = NodePath("HBoxContainer/MarginContainer/VBoxContainer/CustomGrid")
+AddBitmaskButton = NodePath("HBoxContainer/MarginContainer/VBoxContainer/CustomGrid/AddBitmaskBtn")
+CustomBitmaskButton = ExtResource("2_y7qi4")
+EditBitmaskButtonParent = NodePath("HBoxContainer/BoxContainer")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="HBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 40
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 16
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 columns = 2
 
-[node name="GridMain" type="GridContainer" parent="MarginContainer/GridContainer"]
+[node name="GridMain" type="GridContainer" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 columns = 3
 
-[node name="BR" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="BR" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("3_wtf06")
+DefaultBitmask = [false, false, false, false, true, true, false, true, true]
 
-[node name="Bottom" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="Bottom" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("4_c477q")
+DefaultBitmask = [false, false, false, true, true, true, true, true, true]
 
-[node name="BL" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="BL" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("5_euvcq")
+DefaultBitmask = [false, false, false, true, true, false, true, true, false]
 
-[node name="Right" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="Right" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("6_rahus")
+DefaultBitmask = [false, true, true, false, true, true, false, true, true]
 
-[node name="Center" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="Center" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
+DefaultBitmask = [true, true, true, true, true, true, true, true, true]
 
-[node name="Left" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="Left" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("8_ypptr")
+DefaultBitmask = [true, true, false, true, true, false, true, true, false]
 
-[node name="TR" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="TR" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("9_7ynfb")
+DefaultBitmask = [false, true, true, false, true, true, false, false, false]
 
-[node name="Top" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="Top" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("10_ihdhd")
+DefaultBitmask = [true, true, true, true, true, true, false, false, false]
 
-[node name="TL" parent="MarginContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
+[node name="TL" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridMain" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("11_fns8o")
+DefaultBitmask = [true, true, false, true, true, false, false, false, false]
 
-[node name="GridUpDown" type="GridContainer" parent="MarginContainer/GridContainer"]
+[node name="GridUpDown" type="GridContainer" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 
-[node name="SingleTop" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
+[node name="SingleTop" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("12_rs1im")
+DefaultBitmask = [false, false, false, false, true, false, false, true, false]
 
-[node name="UpDown" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
+[node name="UpDown" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("13_pyi5w")
+DefaultBitmask = [false, true, false, false, true, false, false, true, false]
 
-[node name="SingleDown" parent="MarginContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
+[node name="SingleDown" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridUpDown" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("14_ycvft")
+DefaultBitmask = [false, true, false, false, true, false, false, false, false]
 
-[node name="GridLeftRight" type="GridContainer" parent="MarginContainer/GridContainer"]
+[node name="GridLeftRight" type="GridContainer" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 columns = 3
 
-[node name="SingleLeft" parent="MarginContainer/GridContainer/GridLeftRight" instance=ExtResource("2_y7qi4")]
+[node name="SingleLeft" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridLeftRight" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("15_cropc")
+DefaultBitmask = [false, false, false, false, true, true, false, false, false]
 
-[node name="LeftRight" parent="MarginContainer/GridContainer/GridLeftRight" instance=ExtResource("2_y7qi4")]
+[node name="LeftRight" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridLeftRight" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("16_utgin")
+DefaultBitmask = [false, false, false, true, true, true, false, false, false]
 
-[node name="SingleRight" parent="MarginContainer/GridContainer/GridLeftRight" instance=ExtResource("2_y7qi4")]
+[node name="SingleRight" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer/GridLeftRight" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("17_8515p")
+DefaultBitmask = [false, false, false, true, true, false, false, false, false]
 
-[node name="Single" parent="MarginContainer/GridContainer" instance=ExtResource("2_y7qi4")]
+[node name="Single" parent="HBoxContainer/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_y7qi4")]
 layout_mode = 2
 color = Color(0.211765, 0.239216, 0.290196, 1)
 DefaultTexture = ExtResource("18_8jnbj")
+
+[node name="CustomGrid" type="GridContainer" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 5
+columns = 4
+
+[node name="AddBitmaskBtn" parent="HBoxContainer/MarginContainer/VBoxContainer/CustomGrid" instance=ExtResource("2_y7qi4")]
+layout_mode = 2
+color = Color(0.211765, 0.239216, 0.290196, 1)
+DefaultTexture = ExtResource("18_cjtb2")
+
+[node name="BoxContainer" type="BoxContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
