@@ -37,6 +37,14 @@ public class PluginSaveHandler
                     file.StoreVar(tileVariant.AtlasCoords.Y); // Tile Atlas Y
                     file.StoreVar(tileVariant.TileMode); // Tile Mode
                     file.StoreVar(tileVariant.Chance); // Tile Chance
+                    file.StoreVar(tileVariant.DecorativeTiles.Count); // Decorative Tile Count
+                    foreach (DecorativeTileData decorativeTile in tileVariant.DecorativeTiles)
+                    {
+                        file.StoreVar(decorativeTile.AtlasCoords.X); // Decorative Tile Atlas X
+                        file.StoreVar(decorativeTile.AtlasCoords.Y); // Decorative Tile Atlas Y
+                        file.StoreVar(decorativeTile.Direction); // Decorative Direction
+                        file.StoreVar(decorativeTile.Chance); // Decorative Tile Chance
+                    }
                     file.StoreVar(tileVariant.TileBitmasks.Length); // Tile Bitmask Length
                     foreach (bool bitmask in tileVariant.TileBitmasks)
                     {
@@ -106,6 +114,23 @@ public class PluginSaveHandler
                     int atlasY = (int)file.GetVar(); // Tile Atlas Y
                     string tileMode = (string)file.GetVar(); // Tile Mode
                     float chance = (float)file.GetVar(); // Tile Chance
+                    int decorativeTileCount = (int)file.GetVar(); // Decorative Tile Count
+                    List<DecorativeTileData> decorativeTiles = new List<DecorativeTileData>();
+                    for (int z = 0; z < decorativeTileCount; z++)
+                    {
+                        int decorativeAtlasX = (int)file.GetVar(); // Decorative Tile Atlas X
+                        int decorativeAtlasY = (int)file.GetVar(); // Decorative Tile Atlas Y
+                        int direction = (int)file.GetVar(); // Decorative Direction
+                        float decorativeChance = (float)file.GetVar(); // Decorative Tile Chance
+                        decorativeTiles.Add(
+                            new DecorativeTileData(
+                                new Vector2I(decorativeAtlasX, decorativeAtlasY),
+                                direction,
+                                decorativeChance
+                            )
+                        );
+                    }
+
                     int bitmaskLength = (int)file.GetVar(); // Tile Bitmask Length
                     bool[] bitmasks = new bool[bitmaskLength];
                     for (int z = 0; z < bitmaskLength; z++)
@@ -113,7 +138,14 @@ public class PluginSaveHandler
                         bitmasks[z] = (bool)file.GetVar(); // Tile Bitmask
                     }
                     tileVariants.Add(
-                        new TileData(id, new Vector2I(atlasX, atlasY), tileMode, bitmasks, chance)
+                        new TileData(
+                            id,
+                            new Vector2I(atlasX, atlasY),
+                            tileMode,
+                            bitmasks,
+                            chance,
+                            decorativeTiles
+                        )
                     );
                 }
                 tiles.Add(tileVariants);

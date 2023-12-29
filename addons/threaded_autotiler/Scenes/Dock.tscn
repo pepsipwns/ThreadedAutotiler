@@ -88,7 +88,7 @@ grow_vertical = 2
 [node name="MarginLeft" type="MarginContainer" parent="Background/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.5
+size_flags_stretch_ratio = 0.4
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 4
@@ -199,6 +199,7 @@ theme_override_constants/separation = 8
 [node name="TilesBitmaskBackground" type="ColorRect" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.8
 color = Color(0.129412, 0.14902, 0.180392, 1)
 
 [node name="TilesBitmaskParent" type="ScrollContainer" parent="Background/HBox/TerrainTilesPanelNew/ColorRect/Margin/VBoxContainer/HBox/TilesBitmaskBackground"]

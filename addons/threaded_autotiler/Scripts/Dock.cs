@@ -288,7 +288,7 @@ public partial class Dock : Control
                 BitmaskButton c = tilesBitmaskPanel.CreateBitmaskButton(cbd.Name, cbd.Bitmasks);
                 c.Button.Pressed += () =>
                 {
-                    OnEditTileBtnPressed(c, terrainBlock.TerrainNameLabel.Text, 0, true);
+                    OnEditTileBtnPressed(c, terrainBlock.TerrainNameLabel.Text, 0, -1, true);
                 };
                 tilesBitmaskPanel.Buttons.Add(c);
             }
@@ -444,29 +444,27 @@ public partial class Dock : Control
         BitmaskButton button,
         string terrainName,
         int activeVariant = 0,
+        int activeDecorativeTile = -1,
         bool customBitmask = false
     )
     {
+        FreePanel(setTilePanel);
         if (customBitmask)
         {
             CreateEditAndDeleteCustomBitmaskButtons(terrainName, button);
         }
-        FreePanel(setTilePanel);
-        foreach (BitmaskButton b in tilesBitmaskPanel.Buttons)
-        {
-            b.SetSelected(false);
-        }
-        button.SetSelected(true);
+        SelectButton(button);
+
         setTilePanel = SetTilePanel.Instantiate() as SetTilePanel;
         SetTilePanelParent.AddChild(setTilePanel);
         _tileData.TryGetValue(terrainName, out List<List<TileData>> tileData);
-        //Get the array of List<TileData> that have TileMode = button.name
+        //Get the array of List<TileData> that have the clicked tilemode (left, right etc)
         List<TileData> tileVariants = tileData.Find(
             t => t.Count > 0 && t[0].TileMode == button.Name
         );
-        if (tileVariants != null)
+        if (tileVariants != null) //If we have tileVariants
         {
-            // Create a new tile for the active variant if it doesn't exist
+            // Create a new tile for the active variant if it doesn't exist - for adding a new variant
             if (tileVariants.Count <= activeVariant)
             {
                 setTilePanel.SetData(button.DefaultTexture);
@@ -479,38 +477,82 @@ public partial class Dock : Control
                     )
                 );
             }
-            //Otherwise display the active variant if it exists
+            //Otherwise display the active variant if it exists - when clicking the variant buttons
             else
             {
-                TileData td = tileVariants[activeVariant];
-                setTilePanel.SetData(
-                    GetTextureFromAtlasCoords(td.AtlasCoords.X, td.AtlasCoords.Y),
-                    button.DefaultTexture,
-                    td.AtlasCoords.X,
-                    td.AtlasCoords.Y
-                );
+                //If we are interacting with decorative tiles
+                if (activeDecorativeTile >= 0)
+                {
+                    // If we are adding a new decorative tile (it doesn't already exist)
+                    if (tileVariants[activeVariant].DecorativeTiles.Count <= activeDecorativeTile)
+                    {
+                        setTilePanel.SetData(button.DefaultTexture);
+                        tileVariants[activeVariant].DecorativeTiles.Add(
+                            new DecorativeTileData(new Vector2I(0, 0), 0, 100)
+                        );
+                    }
+                    else // Otherwise display the existing decorative tile
+                    {
+                        setTilePanel.SetData(
+                            GetTextureFromAtlasCoords(
+                                tileVariants[activeVariant].DecorativeTiles[activeDecorativeTile]
+                                    .AtlasCoords
+                                    .X,
+                                tileVariants[activeVariant].DecorativeTiles[activeDecorativeTile]
+                                    .AtlasCoords
+                                    .Y
+                            ),
+                            button.DefaultTexture,
+                            tileVariants[activeVariant].DecorativeTiles[activeDecorativeTile]
+                                .AtlasCoords
+                                .X,
+                            tileVariants[activeVariant].DecorativeTiles[activeDecorativeTile]
+                                .AtlasCoords
+                                .Y
+                        );
+                    }
+                    //Display the direction buttons
+                }
+                else // Otherwise display the active variant
+                {
+                    TileData td = tileVariants[activeVariant];
+                    setTilePanel.SetData(
+                        GetTextureFromAtlasCoords(td.AtlasCoords.X, td.AtlasCoords.Y),
+                        button.DefaultTexture,
+                        td.AtlasCoords.X,
+                        td.AtlasCoords.Y
+                    );
+                }
             }
-            // For each variant create a button
-            CreateVariantButtons(button, terrainName, tileVariants, activeVariant);
-            //Create the add button
-            setTilePanel.CreateVariantButton(
-                "+",
-                () => OnEditTileBtnPressed(button, terrainName, tileVariants.Count)
+            // For each variant/decorative tile create a button
+            CreateVariantButtons(
+                button,
+                terrainName,
+                tileVariants,
+                activeDecorativeTile >= 0 ? -1 : activeVariant
             );
-
-            setTilePanel.AlternateTileLabel.Visible = true;
-            if (activeVariant > 0)
-            {
-                setTilePanel.SetupChanceField(activeVariant, tileVariants, () => SaveData());
-            }
+            CreateDecorativeTileButtons(
+                button,
+                terrainName,
+                tileVariants,
+                activeVariant,
+                activeDecorativeTile
+            );
         }
         else // There is no tileVariants
         {
             setTilePanel.SetData(button.DefaultTexture);
         }
         setTilePanel.SetOnClicks(
-            () => SetTileBitmask(setTilePanel, button, terrainName, activeVariant),
-            () => ClearTileBitmask(button, terrainName, activeVariant),
+            () =>
+                SetTileBitmask(
+                    setTilePanel,
+                    button,
+                    terrainName,
+                    activeVariant,
+                    activeDecorativeTile
+                ),
+            () => ClearTileBitmask(button, terrainName, activeVariant, activeDecorativeTile),
             () => OnAtlasCoordsChanged(setTilePanel)
         );
         SaveData();
@@ -534,7 +576,6 @@ public partial class Dock : Control
             _customBitmaskData[terrainName].Remove(
                 _customBitmaskData[terrainName].FirstOrDefault(cbd => cbd.Name == button.Name)
             );
-            //TODO: Delete tiledata associated with this custom bitmask
             _tileData[terrainName].ForEach(tileVariants =>
             {
                 tileVariants.RemoveAll(td => td.TileMode == button.Name);
@@ -565,19 +606,69 @@ public partial class Dock : Control
     {
         for (int x = 0; x < tileVariants.Count; x++)
         {
-            setTilePanel.CreateVariantButton(x.ToString(), null, x == activeVariant);
+            setTilePanel.CreateAlternateTileButton(x.ToString(), null, x == activeVariant);
         }
         foreach (Button b in setTilePanel.AlternateTileButtonParent.GetChildren())
         {
             b.Pressed += () => OnEditTileBtnPressed(button, terrainName, int.Parse(b.Text));
         }
+        //Create the add button
+        setTilePanel.CreateAlternateTileButton(
+            "+",
+            () => OnEditTileBtnPressed(button, terrainName, tileVariants.Count)
+        );
+
+        setTilePanel.AlternateTileLabel.Visible = true;
+
+        if (activeVariant > 0)
+        {
+            setTilePanel.SetupAlternativeTileChanceField(
+                activeVariant,
+                tileVariants,
+                () => SaveData()
+            );
+        }
+    }
+
+    private void CreateDecorativeTileButtons(
+        BitmaskButton button,
+        string terrainName,
+        List<TileData> tileVariants,
+        int activeVariant,
+        int activeDecorativeTile = -1
+    )
+    {
+        TileData td = tileVariants[activeVariant];
+
+        for (int x = 0; x < td.DecorativeTiles.Count; x++)
+        {
+            setTilePanel.CreateDecorativeTileButton(x.ToString(), null, x == activeDecorativeTile);
+        }
+        foreach (Button b in setTilePanel.DecorativeTileButtonParent.GetChildren())
+        {
+            b.Pressed += () =>
+                OnEditTileBtnPressed(button, terrainName, activeVariant, int.Parse(b.Text));
+        }
+        setTilePanel.CreateDecorativeTileButton(
+            "+",
+            () => OnEditTileBtnPressed(button, terrainName, activeVariant, td.DecorativeTiles.Count)
+        );
+        setTilePanel.DecorativeTileLabel.Visible = true;
+
+        if (activeDecorativeTile >= 0 && td.DecorativeTiles.Count > 0)
+            setTilePanel.SetupDecorativeTileChanceFieldAndDirections(
+                activeDecorativeTile,
+                td.DecorativeTiles,
+                () => SaveData()
+            );
     }
 
     private void SetTileBitmask(
         SetTilePanel setTilePanel,
         BitmaskButton button,
         string terrainName,
-        int variant = 0
+        int variant = 0,
+        int decorativeTile = -1
     )
     {
         if (
@@ -589,9 +680,34 @@ public partial class Dock : Control
             return;
         }
 
-        if (variant == 0)
+        if (variant == 0 && decorativeTile == -1)
             button.SetData(setTilePanel.TileTexture.Texture, xInt, yInt);
         button.SetSelected(false);
+
+        if (decorativeTile >= 0)
+        {
+            List<List<TileData>> tileData = _tileData[terrainName]; // It contains tileData, get the List of tiles
+            List<TileData> tileVariants = tileData.Find(
+                t => t.Count > 0 && t[0].TileMode == button.Name
+            );
+            TileData tile = tileVariants[variant];
+            if (tile == null || tile.DecorativeTiles.Count <= decorativeTile)
+            {
+                GD.Print("Tile or decorative tile doesn't exist: ", tile, decorativeTile);
+                return;
+            }
+            float.TryParse(
+                setTilePanel.DecorativeTileChanceTextEdit.Text,
+                out float decorativeChance
+            );
+            tile.DecorativeTiles[decorativeTile].SetData(
+                new Vector2I(xInt, yInt),
+                float.IsNaN(decorativeChance) ? 100 : decorativeChance
+            );
+            OnEditTileBtnPressed(button, terrainName, variant, decorativeTile);
+            SaveData();
+            return;
+        }
 
         float.TryParse(setTilePanel.AlternateTileChanceTextEdit.Text, out float chance);
         TileData td = new TileData(
@@ -623,7 +739,7 @@ public partial class Dock : Control
                 }
                 else
                 {
-                    tileVariants[variant] = td; // If so, replace it
+                    tileVariants[variant].SetData(td); // If so, replace it
                 }
             }
         }
@@ -631,7 +747,12 @@ public partial class Dock : Control
         SaveData();
     }
 
-    private void ClearTileBitmask(BitmaskButton button, string terrainName, int variant = 0)
+    private void ClearTileBitmask(
+        BitmaskButton button,
+        string terrainName,
+        int variant = 0,
+        int decorativeTile = -1
+    )
     {
         if (!_tileData.ContainsKey(terrainName))
         {
@@ -643,6 +764,18 @@ public partial class Dock : Control
         );
         if (tileVariants == null)
         {
+            return;
+        }
+        if (decorativeTile >= 0)
+        {
+            TileData tile = tileVariants[variant];
+            if (tile == null || tile.DecorativeTiles.Count <= decorativeTile)
+            {
+                return;
+            }
+            tile.DecorativeTiles.RemoveAt(decorativeTile);
+            OnEditTileBtnPressed(button, terrainName, variant);
+            SaveData();
             return;
         }
         tileVariants.RemoveAt(variant);
@@ -731,6 +864,15 @@ public partial class Dock : Control
         {
             panel.QueueFree();
         }
+    }
+
+    private void SelectButton(BitmaskButton button)
+    {
+        foreach (BitmaskButton b in tilesBitmaskPanel.Buttons)
+        {
+            b.SetSelected(false);
+        }
+        button.SetSelected(true);
     }
 
     private Texture2D GetTextureFromName(string name)

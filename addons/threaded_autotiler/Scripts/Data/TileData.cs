@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 public class TileData
@@ -10,12 +11,15 @@ public class TileData
 
     public float Chance = 100;
 
+    public List<DecorativeTileData> DecorativeTiles = new List<DecorativeTileData>();
+
     public TileData(
         int id,
         Vector2I atlasCoords,
         string tileMode,
         bool[] bitmasks,
-        float chance = 100
+        float chance = 100,
+        List<DecorativeTileData> decorativeTiles = null
     )
     {
         Id = id;
@@ -23,6 +27,10 @@ public class TileData
         TileMode = tileMode;
         TileBitmasks = bitmasks;
         Chance = chance;
+        if (decorativeTiles != null)
+        {
+            DecorativeTiles = decorativeTiles;
+        }
     }
 
     public void SetData(
@@ -30,6 +38,7 @@ public class TileData
         Vector2I atlasCoords,
         string tileMode,
         bool[] bitmasks,
+        List<DecorativeTileData> decorativeTiles,
         float chance = 100
     )
     {
@@ -37,7 +46,17 @@ public class TileData
         AtlasCoords = atlasCoords;
         TileMode = tileMode;
         TileBitmasks = bitmasks;
+        DecorativeTiles = decorativeTiles;
         Chance = chance;
+    }
+
+    public void SetData(TileData td)
+    {
+        Id = td.Id;
+        AtlasCoords = td.AtlasCoords;
+        TileMode = td.TileMode;
+        TileBitmasks = td.TileBitmasks;
+        Chance = td.Chance;
     }
 
     public void GetData(
@@ -45,6 +64,7 @@ public class TileData
         out Vector2I atlasCoords,
         out string tileMode,
         out bool[] bitmasks,
+        out List<DecorativeTileData> decorativeTiles,
         out float chance
     )
     {
@@ -52,6 +72,7 @@ public class TileData
         atlasCoords = AtlasCoords;
         tileMode = TileMode;
         bitmasks = TileBitmasks;
+        decorativeTiles = DecorativeTiles;
         chance = Chance;
     }
 }

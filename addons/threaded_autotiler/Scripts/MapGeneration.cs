@@ -236,22 +236,35 @@ public partial class MapGeneration : Node
         foreach (ushort[,] bitmask in BitmaskMap)
         {
             Vector2I[,] atlas = new Vector2I[mapSize, mapSize];
+            Vector2I[,] atlasDecorative = new Vector2I[mapSize, mapSize];
             for (int x = 0; x < mapSize; x++)
             {
                 for (int y = 0; y < mapSize; y++)
                 {
+                    atlasDecorative[x, y] = new Vector2I(-1, -1);
                     if (!TerrainMap[z][x, y])
                     {
                         atlas[x, y] = new Vector2I(-1, -1);
                         continue;
                     }
-                    atlas[x, y] = GetAtlasTile(_terrainData[z].Name, bitmask[x, y]);
+                    SetAtlasTile(x, y, atlas, atlasDecorative, _terrainData[z].Name, bitmask[x, y]);
+                }
+            }
+            for (int x = 0; x < mapSize; x++)
+            {
+                for (int y = 0; y < mapSize; y++)
+                {
+                    if (atlasDecorative[x, y].X == -1)
+                        continue;
+                    atlas[x, y] = atlasDecorative[x, y];
                 }
             }
             TileAtlasMap[z] = atlas;
             z++;
         }
     }
+
+    private void GenerateDecorations() { }
 
     private void CreateBitmaskTiles()
     {
@@ -267,7 +280,17 @@ public partial class MapGeneration : Node
                         new BitmaskTile(
                             tileVariant.AtlasCoords,
                             GetBitmaskValueFromBitmaskArray(tileVariant.TileBitmasks),
-                            tileVariant.Chance
+                            tileVariant.Chance,
+                            tileVariant.DecorativeTiles
+                                .Select(
+                                    decorativeTile =>
+                                        new DirectionBitmaskTile(
+                                            decorativeTile.AtlasCoords,
+                                            decorativeTile.Direction,
+                                            decorativeTile.Chance
+                                        )
+                                )
+                                .ToList()
                         )
                     );
                 }
@@ -331,7 +354,14 @@ public partial class MapGeneration : Node
         }
     }
 
-    private Vector2I GetAtlasTile(string terrainName, ushort bitmask)
+    private void SetAtlasTile(
+        int x,
+        int y,
+        Vector2I[,] atlas,
+        Vector2I[,] decorativeAtlas,
+        string terrainName,
+        ushort bitmask
+    )
     {
         List<BitmaskTile> tiles = _bitmaskTiles[terrainName]
             .ToList()
@@ -342,9 +372,48 @@ public partial class MapGeneration : Node
             BitmaskTile[] tilesPassingChance = tiles
                 .FindAll(tile => tile.Chance > random)
                 .ToArray();
-            return tilesPassingChance.Length > 0
-                ? tilesPassingChance[new Random().Next(0, tilesPassingChance.Length)].AtlasValue
-                : tiles[0].AtlasValue;
+            BitmaskTile tileToUse =
+                tilesPassingChance.Length > 0
+                    ? tilesPassingChance[new Random().Next(0, tilesPassingChance.Length)]
+                    : tiles[0];
+            atlas[x, y] = tileToUse.AtlasValue;
+            if (tileToUse.DirectionBitmaskTiles.Count > 0)
+            {
+                random = new Random().Next(0, 100);
+                DirectionBitmaskTile[] directionPassingChance = tileToUse.DirectionBitmaskTiles
+                    .FindAll(tile => tile.Chance > random)
+                    .ToArray();
+                DirectionBitmaskTile tileToUseDirection =
+                    directionPassingChance.Length > 0
+                        ? directionPassingChance[
+                            new Random().Next(0, directionPassingChance.Length)
+                        ]
+                        : tileToUse.DirectionBitmaskTiles[0];
+                switch (tileToUseDirection.Direction)
+                {
+                    case 0: //Left
+                        if (x == 0)
+                            break;
+                        decorativeAtlas[x - 1, y] = tileToUseDirection.AtlasValue;
+                        break;
+                    case 1: //Up
+                        if (y == 0)
+                            break;
+                        decorativeAtlas[x, y - 1] = tileToUseDirection.AtlasValue;
+                        break;
+                    case 2: //Right
+                        if (x == mapSize - 1)
+                            break;
+                        decorativeAtlas[x + 1, y] = tileToUseDirection.AtlasValue;
+                        break;
+                    case 3: //Down
+                        if (y == mapSize - 1)
+                            break;
+                        decorativeAtlas[x, y + 1] = tileToUseDirection.AtlasValue;
+                        break;
+                }
+            }
+            return;
         }
         if (bitmask > 0)
         {
@@ -359,20 +428,22 @@ public partial class MapGeneration : Node
                     List<TileData> tilesPassingChance = centerTile.FindAll(
                         tile => tile.Chance > random
                     );
-                    return tilesPassingChance.Count > 0
-                        ? tilesPassingChance[
-                            new Random().Next(0, tilesPassingChance.Count)
-                        ].AtlasCoords
-                        : centerTile[0].AtlasCoords;
+                    TileData tileDataToUse =
+                        tilesPassingChance.Count > 0
+                            ? tilesPassingChance[new Random().Next(0, tilesPassingChance.Count)]
+                            : centerTile[0];
+                    atlas[x, y] = tileDataToUse.AtlasCoords;
+                    return;
                 }
             }
             if (_tileData[terrainName].Count > 0)
             {
-                return _tileData[terrainName][0][0].AtlasCoords;
+                atlas[x, y] = _tileData[terrainName][0][0].AtlasCoords;
+                return;
             }
         }
 
-        return new Vector2I(-1, -1);
+        atlas[x, y] = new Vector2I(-1, -1);
     }
 
     public int GetMaxStage()
