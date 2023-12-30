@@ -237,11 +237,18 @@ public partial class MapGeneration : Node
         {
             Vector2I[,] atlas = new Vector2I[mapSize, mapSize];
             Vector2I[,] atlasDecorative = new Vector2I[mapSize, mapSize];
+
             for (int x = 0; x < mapSize; x++)
             {
                 for (int y = 0; y < mapSize; y++)
                 {
                     atlasDecorative[x, y] = new Vector2I(-1, -1);
+                }
+            }
+            for (int x = 0; x < mapSize; x++)
+            {
+                for (int y = 0; y < mapSize; y++)
+                {
                     if (!TerrainMap[z][x, y])
                     {
                         atlas[x, y] = new Vector2I(-1, -1);
