@@ -24,6 +24,7 @@ https://gyazo.com/b6819b1f90f9f3b8f34d4e53a743d838
      - Create any custom bitmask you need with the + icon. **(New update)**
 - Enter your tile's atlas positions, and press 'Set Tile'.
      - Create any tile variants here for alternate tiles you want to show up, and set the chance they appear. **(New update)**
+     - Create any tile decorations here, these are tiles that will show above/left/right/below of the tile regardless of terrain (so flowers on top of grass, shadow tiles etc) **(New update)**
 - Once your happy all  your tiles are in position, thats all we need to do here!
 
 In your map generation script, or perhaps your using this for chunking, whatever! There are two functions (at the moment) which you need! I've used C# to build this plugin so all the functions are in C# currently.
