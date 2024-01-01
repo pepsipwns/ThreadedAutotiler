@@ -19,8 +19,8 @@ public partial class MapGeneration : Node
     public bool[][,] TerrainMap;
     public ushort[][,] BitmaskMap;
     public Vector2I[][,] TileAtlasMap;
-    private int mapSize = 10;
-    private bool useEdges = false;
+    private int _mapSize = 10;
+    private bool _useEdges = false;
 
     private Dictionary<string, List<List<TileData>>> _tileData =
         new Dictionary<string, List<List<TileData>>>();
@@ -29,28 +29,42 @@ public partial class MapGeneration : Node
 
     private List<TerrainData> _terrainData = new List<TerrainData>();
 
-    private Dictionary<string, List<CustomBitmaskData>> _customBitmaskData =
-        new Dictionary<string, List<CustomBitmaskData>>();
+    private FastNoiseLite _heightNoise;
+    private FastNoiseLite _biomeNoise;
 
     public override void _Ready()
     {
         Instance = this;
     }
 
+    public void GenerateMap(FastNoiseLite noise, int mapSize, bool useEdges)
+    {
+        FastNoiseLite noise2 = noise;
+        noise2.Seed *= 2;
+        GenerateMap(noise, noise2, mapSize, useEdges);
+    }
+
     /// <summary>
     /// This generates all the map data based on the terrains and tiles you have created.
     /// This will need to be run first to generate the data that will be saved to file, and the atlas data that will be used to create the TileMap.
     /// </summary>
-    /// <param name="noise">The FastNoiseLite noise that generates the map</param>
+    /// <param name="heightNoise">The FastNoiseLite noise that generates the map</param>
     /// <param name="mapSize">The size of the map (i.e. 100x100 tiles square)</param>
     /// <param name="useEdges">If the terrain generation rules should consider the edges as the same tile (joining) or not, useful for chunking.</param>
-    public void GenerateMap(FastNoiseLite noise, int mapSize, bool useEdges)
+    public void GenerateMap(
+        FastNoiseLite heightNoise,
+        FastNoiseLite biomeNoise,
+        int mapSize,
+        bool useEdges
+    )
     {
-        this.mapSize = mapSize;
-        this.useEdges = useEdges;
+        _mapSize = mapSize;
+        _useEdges = useEdges;
+        _heightNoise = heightNoise;
+        _biomeNoise = biomeNoise;
         double time = Time.GetUnixTimeFromSystem();
         LoadTerrainData();
-        GenerateTerrainMap(noise);
+        GenerateTerrainMap();
         GenerateBitmaskMap();
         GenerateAtlasMap();
         MapGenerated = true;
@@ -69,9 +83,9 @@ public partial class MapGeneration : Node
     {
         for (int z = 0; z < TileAtlasMap.Length; z++)
         {
-            for (int x = 0; x < mapSize; x++)
+            for (int x = 0; x < _mapSize; x++)
             {
-                for (int y = 0; y < mapSize; y++)
+                for (int y = 0; y < _mapSize; y++)
                 {
                     if (tilemap.GetLayersCount() - 1 < z)
                     {
@@ -90,7 +104,11 @@ public partial class MapGeneration : Node
 
     private void LoadTerrainData()
     {
-        PluginSaveHandler.LoadData(out _tileData, out _terrainData, out _customBitmaskData);
+        PluginSaveHandler.LoadData(
+            out _tileData,
+            out _terrainData,
+            out Dictionary<string, List<CustomBitmaskData>> _customBitmaskData
+        );
         TerrainMap = new bool[_terrainData.Count][,];
         BitmaskMap = new ushort[_terrainData.Count][,];
         TileAtlasMap = new Vector2I[_terrainData.Count][,];
@@ -98,20 +116,22 @@ public partial class MapGeneration : Node
         CreateBitmaskTiles();
     }
 
-    private void GenerateTerrainMap(FastNoiseLite noise)
+    private void GenerateTerrainMap()
     {
         int count = 0;
         foreach (TerrainData td in _terrainData)
         {
-            bool[,] terrains = new bool[mapSize, mapSize];
-            for (int x = 0; x < mapSize; x++)
+            bool[,] terrains = new bool[_mapSize, _mapSize];
+            for (int x = 0; x < _mapSize; x++)
             {
-                for (int y = 0; y < mapSize; y++)
+                for (int y = 0; y < _mapSize; y++)
                 {
-                    float value = noise.GetNoise2D(x, y);
+                    float value = _heightNoise.GetNoise2D(x, y);
+                    float biome = _biomeNoise.GetNoise2D(x, y);
                     if (value > td.Height)
                     {
-                        terrains[x, y] = true;
+                        if (biome > td.Biome)
+                            terrains[x, y] = true;
                     }
                     else
                     {
@@ -130,11 +150,11 @@ public partial class MapGeneration : Node
         foreach (bool[,] terrain in TerrainMap)
         {
             Stage++;
-            ushort[,] bitmasks = new ushort[mapSize, mapSize];
-            for (int x = 0; x < mapSize; x++)
+            ushort[,] bitmasks = new ushort[_mapSize, _mapSize];
+            for (int x = 0; x < _mapSize; x++)
             {
-                StageProgress = (float)x / (float)mapSize * 100;
-                for (int y = 0; y < mapSize; y++)
+                StageProgress = (float)x / (float)_mapSize * 100;
+                for (int y = 0; y < _mapSize; y++)
                 {
                     if (!terrain[x, y])
                     {
@@ -155,27 +175,27 @@ public partial class MapGeneration : Node
                     //If we are at the map edges, use the UseEdges value to determine if we should include the edge tiles (for chunking)
                     if (x == 0)
                     {
-                        l = useEdges;
-                        tl = useEdges;
-                        bl = useEdges;
+                        l = _useEdges;
+                        tl = _useEdges;
+                        bl = _useEdges;
                     }
-                    if (x == mapSize - 1)
+                    if (x == _mapSize - 1)
                     {
-                        r = useEdges;
-                        tr = useEdges;
-                        br = useEdges;
+                        r = _useEdges;
+                        tr = _useEdges;
+                        br = _useEdges;
                     }
                     if (y == 0)
                     {
-                        t = useEdges;
-                        tl = useEdges;
-                        tr = useEdges;
+                        t = _useEdges;
+                        tl = _useEdges;
+                        tr = _useEdges;
                     }
-                    if (y == mapSize - 1)
+                    if (y == _mapSize - 1)
                     {
-                        b = useEdges;
-                        bl = useEdges;
-                        br = useEdges;
+                        b = _useEdges;
+                        bl = _useEdges;
+                        br = _useEdges;
                     }
 
                     //If we are not at the map edges, check the surrounding tiles to see if we should include them
@@ -184,15 +204,15 @@ public partial class MapGeneration : Node
                         l = terrain[x - 1, y];
                         if (y > 0)
                             tl = terrain[x - 1, y - 1];
-                        if (y < mapSize - 1)
+                        if (y < _mapSize - 1)
                             bl = terrain[x - 1, y + 1];
                     }
-                    if (x < mapSize - 1)
+                    if (x < _mapSize - 1)
                     {
                         r = terrain[x + 1, y];
                         if (y > 0)
                             tr = terrain[x + 1, y - 1];
-                        if (y < mapSize - 1)
+                        if (y < _mapSize - 1)
                             br = terrain[x + 1, y + 1];
                     }
                     if (y > 0)
@@ -200,15 +220,15 @@ public partial class MapGeneration : Node
                         t = terrain[x, y - 1];
                         if (x > 0)
                             tl = terrain[x - 1, y - 1];
-                        if (x < mapSize - 1)
+                        if (x < _mapSize - 1)
                             tr = terrain[x + 1, y - 1];
                     }
-                    if (y < mapSize - 1)
+                    if (y < _mapSize - 1)
                     {
                         b = terrain[x, y + 1];
                         if (x > 0)
                             bl = terrain[x - 1, y + 1];
-                        if (x < mapSize - 1)
+                        if (x < _mapSize - 1)
                             br = terrain[x + 1, y + 1];
                     }
 
@@ -235,19 +255,19 @@ public partial class MapGeneration : Node
         int z = 0;
         foreach (ushort[,] bitmask in BitmaskMap)
         {
-            Vector2I[,] atlas = new Vector2I[mapSize, mapSize];
-            Vector2I[,] atlasDecorative = new Vector2I[mapSize, mapSize];
+            Vector2I[,] atlas = new Vector2I[_mapSize, _mapSize];
+            Vector2I[,] atlasDecorative = new Vector2I[_mapSize, _mapSize];
 
-            for (int x = 0; x < mapSize; x++)
+            for (int x = 0; x < _mapSize; x++)
             {
-                for (int y = 0; y < mapSize; y++)
+                for (int y = 0; y < _mapSize; y++)
                 {
                     atlasDecorative[x, y] = new Vector2I(-1, -1);
                 }
             }
-            for (int x = 0; x < mapSize; x++)
+            for (int x = 0; x < _mapSize; x++)
             {
-                for (int y = 0; y < mapSize; y++)
+                for (int y = 0; y < _mapSize; y++)
                 {
                     if (!TerrainMap[z][x, y])
                     {
@@ -257,9 +277,9 @@ public partial class MapGeneration : Node
                     SetAtlasTile(x, y, atlas, atlasDecorative, _terrainData[z].Name, bitmask[x, y]);
                 }
             }
-            for (int x = 0; x < mapSize; x++)
+            for (int x = 0; x < _mapSize; x++)
             {
-                for (int y = 0; y < mapSize; y++)
+                for (int y = 0; y < _mapSize; y++)
                 {
                     if (atlasDecorative[x, y].X == -1)
                         continue;
@@ -409,12 +429,12 @@ public partial class MapGeneration : Node
                         decorativeAtlas[x, y - 1] = tileToUseDirection.AtlasValue;
                         break;
                     case 2: //Right
-                        if (x == mapSize - 1)
+                        if (x == _mapSize - 1)
                             break;
                         decorativeAtlas[x + 1, y] = tileToUseDirection.AtlasValue;
                         break;
                     case 3: //Down
-                        if (y == mapSize - 1)
+                        if (y == _mapSize - 1)
                             break;
                         decorativeAtlas[x, y + 1] = tileToUseDirection.AtlasValue;
                         break;
